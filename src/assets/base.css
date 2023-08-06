@@ -23,8 +23,9 @@
 
 
 
-
+  --color-red: #df3434;
   --color-green: #5ecf5e;
+  --color-orange: #eda927;
 }
 
 /* semantic color variables for this project */
@@ -62,7 +63,7 @@
   box-sizing: border-box;
   margin: 0;
   position: relative;
-  font-weight: normal;
+  /* font-weight: normal; */
 }
 
 body {
@@ -82,3 +83,30 @@ body {
 
 .cf:after{content: ''; display: block; clear: both;}
 .txt-overflow1{overflow: hidden; text-overflow: ellipsis; white-space: nowrap;}
+
+.grid .row{
+  display: flex;
+}
+.grid .row .col{
+  display: inline-flex;
+}
+
+.white-box{
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid #eee;
+  box-shadow: 0 0 5px rgba(0, 0, 0, .15);
+  background: #fff;
+}
+
+.btn-form{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 5px;
+  padding: 5px;
+  height: 32px;
+  min-width: 80px;
+  font-weight: 900;
+}

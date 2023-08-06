@@ -7,41 +7,63 @@
         <nav>
           <ul>
             <li>
-              <strong><RouterLink to="/admin/booklist">도서</RouterLink></strong>
+              <strong>도서</strong>
               <ul>
-                <li><RouterLink to="/admin/booklist">도서 목록</RouterLink></li>
+                <li>도서 목록</li>
                 <li>도서 등록</li>
               </ul>
             </li>
             <li>
-              <strong><RouterLink to="/admin/userlist">회원</RouterLink></strong>
+              <strong>회원</strong>
               <ul>
-                <li><RouterLink to="/admin/userlist">회원 목록</RouterLink></li>
+                <li>회원 목록</li>
                 <li>회원 등록</li>
               </ul>
             </li>
             <li>
-              <strong><RouterLink to="/admin/lentbooklist">대여/반납</RouterLink></strong>
+              <strong>대여/반납</strong>
               <ul>
-                <li><RouterLink to="/admin/lentbooklist">대여 목록</RouterLink></li>
+                <li>대여 목록</li>
                 <li>대여</li>
                 <li>반납</li>
               </ul>
             </li>
             <li>
-              <strong>
-                <RouterLink to="/admin/booklistwidthnoauthorcde">
-                  청구번호 관리
-                  <span>1</span>
-                </RouterLink>
-              </strong>
+              <strong>청구번호관리</strong>
             </li>
           </ul>
         </nav>
       </aside>
       <section>
         <header></header>
-        <RouterView />
+        <article class="book-list-page">
+          <h1>도서목록</h1>
+          <div class="white-box">
+            <div class="grid search-case">
+              <div class="row">
+                <label class="col">
+                  <span>검색어</span>
+                  <input type="text" class=""/>
+                </label>
+              </div>
+              <div class="row">
+                <div class="title col">도서상태</div>
+                <label class="col">
+                  <input type="radio" name="bookStatus" checked/>
+                  <span>전체</span>
+                </label>
+                <label class="col">
+                  <input type="radio" name="bookStatus" />
+                  <span>대여중</span>
+                </label>
+                <label class="col">
+                  <input type="radio" name="bookStatus" />
+                  <span>보류</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </article>
       </section>
     </main>
   </div>
@@ -51,7 +73,6 @@
   .main-wrapper{
     // padding: 10px;
     height: 100vh;
-    min-width: 1080px;
     
     main{
       display: flex;
@@ -100,27 +121,6 @@
           color: #333;
 
           li{
-
-            cursor: pointer;
-
-            a{
-              text-decoration: none;
-              color: #000;
-
-              span{
-                  min-width: 20px;
-                  padding: 0 5px;
-                  background: red;
-                  display: inline-block;
-                  vertical-align: top;
-                  color: #fff;
-                  border-radius: 20px;
-                  text-align: center;
-                  font-weight: bold;
-                  font-size: 12px;
-                }
-            }
-
             strong{
               display: flex;
               height: 40px;
@@ -136,8 +136,6 @@
                 transition: transform .1s;
                 background: rgba(255, 255, 255, .2);
               }
-
-              
             }
 
             ul{
@@ -154,6 +152,7 @@
                 align-items: center;
 
                 &:hover{
+                  color: #fff;
                   transform: scale(1.05);
                   transition: transform .1s;
                   background: rgba(255, 255, 255, .2);
@@ -170,11 +169,10 @@
       section{
         display: flex;
         flex-direction: column;
-        flex: 1 0 auto;
+        flex: 1;
   
         header{
           height: 50px;
-          min-height: 50px;
           width: 100%;
           // background: linear-gradient(to bottom, #eee, #fff);
           background: #fff;
@@ -184,7 +182,8 @@
         article{
           flex: 1;
           background: #faf8fb;
-          padding: 20px;
+          padding: 10px;
+          // background: green;
         }
       }
   

@@ -1,26 +1,24 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
-import { ref } from 'vue'
-import HelloWorld from './components/HelloWorld.vue'
+  import { RouterLink, RouterView } from 'vue-router'
+  import { ref } from 'vue'
+  import HelloWorld from './components/HelloWorld.vue'
 
 
-const header = ref(null);
-const main = ref(null);
-const hamburger = ref(null);
-const nav = ref(null);
+  const header = ref(null);
+  const main = ref(null);
+  const hamburger = ref(null);
+  const nav = ref(null);
 
-const setMenu = (bool) => {
-  if(window.innerWidth < 761) return;
-  const target = header._value;
-  if(bool === undefined) target.classList.toggle('show-menu');
-}
-const setMenu_m = (bool) => {
-  const target = hamburger._value;
-  if(bool === undefined) target.classList.toggle('close');
-  nav._value.classList[target.classList.contains('close') ? 'add' : 'remove']('show-menu');
-}
-
-
+  const setMenu = (bool) => {
+    if(window.innerWidth < 761) return;
+    const target = header._value;
+    if(bool === undefined) target.classList.toggle('show-menu');
+  }
+  const setMenu_m = (bool) => {
+    const target = hamburger._value;
+    if(bool === undefined) target.classList.toggle('close');
+    nav._value.classList[target.classList.contains('close') ? 'add' : 'remove']('show-menu');
+  }
 </script>
 
 <!-- <template>
