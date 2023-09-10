@@ -4,6 +4,7 @@ import HomeView from '../views/HomeView.vue'
 import AdminView from '../views/AdminView.vue'
 
 import BookList from '../views/admin/BookList.vue'
+import Book1 from '../views/admin/Book1.vue'
 import BookListWithNoAuthorCde from '../views/admin/BookListWithNoAuthorCde.vue'
 import LentBookList from '../views/admin/LentBookList.vue'
 import UserList from '../views/admin/UserList.vue'
@@ -28,6 +29,11 @@ const router = createRouter({
           path: 'booklist',
           name: 'booklist',
           component: BookList
+        },
+        {
+          path: 'book1',
+          name: 'book1',
+          component: Book1
         },
         {
           path: 'userlist',

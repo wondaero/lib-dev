@@ -13,6 +13,7 @@
     const target = header._value;
     if(bool === undefined) target.classList.toggle('show-menu');
   }
+  
   const setMenu_m = (bool) => {
     const target = hamburger._value;
     if(bool === undefined) target.classList.toggle('close');

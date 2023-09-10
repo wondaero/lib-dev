@@ -1,3 +1,22 @@
+<script setup>
+  import { reactive, ref, nextTick } from 'vue';
+
+  const bookPop = ref(null);
+
+  const returnBook = () => {
+    if(confirm('반납하시겠습니까?')){
+    }
+  };
+  const extendDate = () => {
+    if(confirm('연장하시겠습니까?')){
+    }
+  };
+
+  const preventLink = (event) => {
+    event.stopPropagation();
+  }
+
+</script>
 <template>
   <article class="book-list-page">
     <h1>도서 목록</h1>
@@ -42,29 +61,31 @@
       </header>
       <ul class="list">
         <li v-for="n in 2">
+          <RouterLink to="/admin/book1">
           <div class="top">
-            <div class="left">
-              <strong class="book-cde">[EM00004375]</strong>
-              <span class="book-title txt-overflow1">프리젠테이션 오!프리젠테이션</span>
+              <div class="left">
+                <strong class="book-cde">[EM00004375]</strong>
+                <span class="book-title txt-overflow1">프리젠테이션 오!프리젠테이션</span>
+              </div>
+              <div class="right">
+                <strong>연체중</strong>
+                <strong>(원대로)</strong>
+              </div>
             </div>
-            <div class="right">
-              <strong>연체중</strong>
-              <strong>(원대로)</strong>
+            <div class="bottom">
+              <div class="left">
+                <span>한정선 지음</span>|<span>김영사</span>
+              </div>
+              <div class="right">
+                <strong>[325.1]</strong>
+                <strong>한74ㅍ</strong>
+              </div>
             </div>
-          </div>
-          <div class="bottom">
-            <div class="left">
-              <span>한정선 지음</span>|<span>김영사</span>
-            </div>
-            <div class="right">
-              <strong>[325.1]</strong>
-              <strong>한74ㅍ</strong>
-            </div>
-          </div>
-          <div class="option">
-            <input type="date" />
-            <button class="btn-form btn-extend">연장</button>
-            <button class="btn-form btn-return">반납</button>
+          </RouterLink>
+          <div class="option" @click.capture="preventLink">
+            <input type="date"/>
+            <button class="btn-form btn-extend" @click.prevent="extendDate">연장</button>
+            <button class="btn-form btn-return" @click.prevent="returnBook">반납</button>
           </div>
         </li>
       </ul>
@@ -144,6 +165,7 @@
       margin-bottom: 10px;
 
       li{
+
         background: #fafbfc;
         border-radius: 10px;
         padding: 20px;
@@ -158,38 +180,46 @@
 
         &:hover{
           background: var(--color-green);
-          color: #fff;
+          a{
+            color: #fff;
+            background: 0;
+          }
         }
 
-
-        .top{
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-
-          .left{
-            flex: 1;
+        a{
+          display: block;
+          text-decoration: none;
+          color: #000;
+          
+          .top{
             display: flex;
-            margin-right: 5px;
-            width: 10px;
-            white-space: nowrap;
-            overflow: hidden;
-            .book-cde{margin-right: 5px;}
-            .book-title{flex: 1;}
+            align-items: center;
+            justify-content: space-between;
+  
+            .left{
+              flex: 1;
+              display: flex;
+              margin-right: 5px;
+              width: 10px;
+              white-space: nowrap;
+              overflow: hidden;
+              .book-cde{margin-right: 5px;}
+              .book-title{flex: 1;}
+            }
           }
-        }
-
-        .bottom{
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-
-          .left{
-            flex: 1;
-            margin-right: 5px;
+  
+          .bottom{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+  
+            .left{
+              flex: 1;
+              margin-right: 5px;
+            }
           }
+  
         }
-
         .option{
           display: flex;
           justify-content: flex-end;

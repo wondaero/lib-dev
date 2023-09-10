@@ -10,7 +10,7 @@
               <strong><RouterLink to="/admin/booklist">도서</RouterLink></strong>
               <ul>
                 <li><RouterLink to="/admin/booklist">도서 목록</RouterLink></li>
-                <li>도서 등록</li>
+                <li><RouterLink to="/admin/book1">도서 등록</RouterLink></li>
               </ul>
             </li>
             <li>
