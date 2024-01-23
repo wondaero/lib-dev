@@ -5,9 +5,11 @@ import AdminView from '../views/AdminView.vue'
 
 import BookList from '../views/admin/BookList.vue'
 import Book1 from '../views/admin/Book1.vue'
-import BookListWithNoAuthorCde from '../views/admin/BookListWithNoAuthorCde.vue'
-import LentBookList from '../views/admin/LentBookList.vue'
+import BookListWithNoClassCde from '../views/admin/BookListWithNoClassCde.vue'
+import BorrowedBookList from '../views/admin/BorrowedBookList.vue'
+import Borrow from '../views/admin/Borrow.vue'
 import UserList from '../views/admin/UserList.vue'
+import User1 from '../views/admin/User1.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -33,7 +35,12 @@ const router = createRouter({
         {
           path: 'book1',
           name: 'book1',
-          component: Book1
+          component: Book1,
+        },
+        {
+          path: 'book1/:book_cde?',
+          name: 'book1',
+          component: Book1,
         },
         {
           path: 'userlist',
@@ -41,14 +48,29 @@ const router = createRouter({
           component: UserList
         },
         {
-          path: 'lentbooklist',
-          name: 'lentbooklist',
-          component: LentBookList
+          path: 'user1',
+          name: 'user1',
+          component: User1,
         },
         {
-          path: 'booklistwidthnoauthorcde',
-          name: 'booklistwidthnoauthorcde',
-          component: BookListWithNoAuthorCde
+          path: 'user1/:user_cde?',
+          name: 'user1',
+          component: User1,
+        },
+        {
+          path: 'borrowedBookList',
+          name: 'borrowedBookList',
+          component: BorrowedBookList
+        },
+        {
+          path: 'borrow',
+          name: 'borrow',
+          component: Borrow
+        },
+        {
+          path: 'bookListWithNoClassCde',
+          name: 'bookListWithNoClassCde',
+          component: BookListWithNoClassCde
         },
       ]
     }

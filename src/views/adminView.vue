@@ -1,3 +1,22 @@
+<script setup>
+  import { reactive, onMounted } from 'vue';
+  import axios from 'axios';
+
+  const state = reactive({
+    bookWithNoClassCde: 0,
+  });
+
+  const getBooksWithNoClassCdeCnt = () => {
+    axios.get("http://localhost:3000/getBooksWithNoClassCdeCnt").then((res) => {
+      state.bookWithNoClassCde = res.data[0].CNT;
+    });
+  }
+
+  onMounted(() => {
+    getBooksWithNoClassCdeCnt();
+  })
+
+</script>
 <template>
   <div class="main-wrapper">
     <main>
@@ -17,31 +36,43 @@
               <strong><RouterLink to="/admin/userlist">회원</RouterLink></strong>
               <ul>
                 <li><RouterLink to="/admin/userlist">회원 목록</RouterLink></li>
-                <li>회원 등록</li>
+                <li><RouterLink to="/admin/user1">회원 등록</RouterLink></li>
               </ul>
             </li>
             <li>
-              <strong><RouterLink to="/admin/lentbooklist">대여/반납</RouterLink></strong>
+              <strong><RouterLink to="/admin/borrowedBookList">대여/반납</RouterLink></strong>
               <ul>
-                <li><RouterLink to="/admin/lentbooklist">대여 목록</RouterLink></li>
-                <li>대여</li>
+                <li><RouterLink to="/admin/borrowedBookList">대여 목록</RouterLink></li>
+                <li><RouterLink to="/admin/borrow">대여</RouterLink></li>
                 <li>반납</li>
               </ul>
             </li>
             <li>
+              <strong><RouterLink to="/admin/bookListWithNoClassCde">프린터</RouterLink></strong>
+              <ul>
+                <li>
+                  <RouterLink to="/admin/bookListWithNoClassCde">
+                    청구번호 관리
+                    <span v-if="state.bookWithNoClassCde > 0">{{ state.bookWithNoClassCde }}</span>
+                  </RouterLink>
+                </li>
+                <li>바코드 출력</li>
+              </ul>
+            </li>
+            <!-- <li>
               <strong>
-                <RouterLink to="/admin/booklistwidthnoauthorcde">
+                <RouterLink to="/admin/bookListWithNoClassCde">
                   청구번호 관리
-                  <span>1</span>
+                  <span v-if="state.bookWithNoClassCde > 0">{{ state.bookWithNoClassCde }}</span>
                 </RouterLink>
               </strong>
-            </li>
+            </li> -->
           </ul>
         </nav>
       </aside>
       <section>
         <header></header>
-        <RouterView />
+        <RouterView @childToParent="getBooksWithNoClassCdeCnt"/>
       </section>
     </main>
   </div>
@@ -149,7 +180,7 @@
 
               li{
                 height: 40px;
-                padding-left: 45px;
+                padding-left: 30px;
                 display: flex;
                 align-items: center;
 

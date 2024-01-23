@@ -1,8 +1,4 @@
 const methods = {
-  alert22(){
-    alert();
-  },
-
   calcPage(option) {
     const TOTAL_CNT = option.totalListCnt;
     const VIEW_PAGE = option.viewPageCnt ? option.viewPageCnt : 10;
@@ -242,6 +238,20 @@ const methods = {
     if (0x3130 <= c && c <= 0x318F) return true;
     if (0xAC00 <= c && c <= 0xD7A3) return true;
     return false;
+  },
+
+  objToURLParam: (obj) => {
+    if(obj === undefined) return '';
+
+    const param = '';
+    const tmpArr = [];
+
+    for(let key in obj){
+      if(!obj[key]) continue;
+      tmpArr.push(`${key}=${obj[key]}`);
+    }
+
+    return tmpArr.join('&');
   }
 }
 
@@ -249,18 +259,6 @@ const methods = {
 export default {
   xmlToObjArr: methods.xmlToObjArr,
   getClassifiedBookInfo: methods.getClassifiedBookInfo,
-  getClassCde: methods.getClassCde
+  getClassCde: methods.getClassCde,
+  objToURLParam: methods.objToURLParam
 }
-
-// export default {
-//   install (Vue) {
-//     Vue.prototype.$alert22 = methods.alert22;
-//     Vue.prototype.$calcPage = methods.calcPage;
-//     Vue.prototype.$setGroupByNum = methods.setGroupByNum;
-//     Vue.prototype.$getLimitParam = methods.getLimitParam;
-//     Vue.prototype.$initPageControl = methods.initPageControl;
-//     Vue.prototype.$xmlToObjArr = methods.xmlToObjArr;
-//     Vue.prototype.$getClassifiedBookInfo = methods.getClassifiedBookInfo;
-//     Vue.prototype.$getClassCde = methods.getClassCde;
-//   }
-// }

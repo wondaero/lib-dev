@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>청구 기호 출력</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <style>
+      header{
+        padding: 10px;
+        display: flex;
+        align-items: center;
+      }
+
+      header > *{
+        margin-right: 5px;
+        margin-bottom: 0;
+      }
+      header > *:last-child{
+        margin-right: 0;
+      }
+
+      button{width: 80px;}
+
+      input[type="number"]{
+        display: inline-block;
+        width: 60px;
+      }
+      
+      input[type="number"]::-webkit-outer-spin-button,
+      input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+      
+      .board{
+        margin: 0 auto;
+        padding-top: 30mm;
+        padding-left: 15mm;
+      }
+
+      .board .item{
+        width: 30mm;
+        height: 31mm;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 7.8mm;
+        margin-bottom: 10.5mm;
+        box-sizing: border-box;
+        padding: 10px 0;
+        text-align: center;
+        vertical-align: top;
+        background: #eee;
+        border-radius: 5px;
+      }
+      .board .item:nth-of-type(5n){
+        margin-right: 0;
+      }
+      .board .item .item-inner-wrapper{
+        height: 100%;
+        line-height: 18px;
+        display: flex;
+        flex-direction: column;
+      }
+      .board .item .item-inner-wrapper .top-info{
+        flex: 1;
+      }
+
+      @media print {
+        header{display: none;}
+        .board .item{
+          border-radius: 0;
+          background: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <label>
+        <strong>빈칸: </strong> 
+        <input type="number" id="input_blank" class="form-control" placeholder="0~29" value="0" max="29">
+      </label>
+      <button class="btn btn-warning" onclick="fnc_blank()">적용</button>
+      <button id="btn_print" class="btn btn-success" onclick="fnc_print()">인쇄</button>
+      <button class="btn btn-default" onclick="fnc_close()">취소</button>
+    </header>
+    <div id="board" class="board"></div>
+
+    <script src="src/assets/js/jquery-3.4.1.min.js"></script>
+    <script src="src/assets/js/jquery-barcode.js"></script>
+    <script>
+      const qs = trg => document.querySelector(trg);
+      const qsa = trgs => document.querySelectorAll(trgs);
+
+      const chkedInput = opener.document.querySelectorAll('[data-id="bookChkBox"]:checked');
+      const board = qs('#board');
+
+      const data = [];
+      const bookCdes = [];
+
+      function fnc_print() {
+        window.print();
+      }
+
+      function fnc_close() {
+        window.close();
+      }
+
+      btn_print.focus();
+
+      function fnc_blank(){
+        const blankCnt = input_blank.value > 0 && input_blank.value < (30 - chkedInput.length) ? input_blank.value : 0;
+        setCode(blankCnt);
+      }
+
+      chkedInput.forEach(function(input){
+        data.push(input.dataset);
+        bookCdes.push(input.dataset.bookCde);
+      })
+
+      board.innerHTML = '';
+
+      setCode(0);
+      
+      function setCode(blankCnt){
+        let cstmData = data.slice();
+
+        
+        for(let i = 0; i < blankCnt; i++) cstmData.unshift('');
+        
+        board.innerHTML = '';
+        
+        for(let j = 0; j < 30; j++){
+          const div = document.createElement('div');
+          div.id = `classCde${j}`;
+          div.classList.add('item');
+
+          // if(j%5 == 4) div.style.marginRight = 0;
+
+          if(cstmData[j]){
+            div.innerHTML = `
+              <div class="item-inner-wrapper">
+                <div class="top-info">
+                  <div class="authorCode_classNo">${cstmData[j].classNo}</div>
+                  <div class="authorCode_authorCode">${cstmData[j].classCde}</div>
+                  <div class="authorCode_claimNo">${cstmData[j].startVol ?  'v. ' + cstmData[j].startVol : ''}</div>
+                </div>
+                <div class="authorCode_bookCde">${cstmData[j].bookCde}</div>
+              </div>
+            `;
+          }
+
+          board.appendChild(div);
+          
+        }
+      }
+
+      if (window.matchMedia) {
+        var mediaQueryList = window.matchMedia('print');
+        mediaQueryList.addListener(function(mql) {
+          if (mql.matches) {
+            //before
+          } else {
+            //after;
+            if(confirm('정상적으로 인쇄가 되었습니까?')){
+              $.ajax({
+                type: 'POST',
+                url: 'http://localhost:3000/updateClassCdeChk_y',
+                data: {bookCde: bookCdes},
+                success: function(res){
+                  window.close();
+                  opener.document.querySelector('#hiddenBtn').click();
+                },
+                error: (err) => {
+                  console.err(err);
+                  alert('관리자에게 문의해주세요.');
+                  window.close();
+                }
+              })
+            }else{
+              alert('인쇄를 다시 진행해 주세요.');
+              window.close();
+            }
+          }
+        });
+      }
+    </script>
+  </body>
+</html>

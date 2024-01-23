@@ -109,4 +109,5 @@ body {
   height: 32px;
   min-width: 80px;
   font-weight: 900;
+  cursor: pointer;
 }

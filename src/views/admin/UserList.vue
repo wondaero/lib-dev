@@ -1,5 +1,10 @@
 <script setup>
   import {reactive} from 'vue';
+  import axios from 'axios';
+  import commonJS from '../../assets/common';
+
+  import Pagination from '../../components/Pagination.vue'
+
   const toggleBookList = (bool, userCde) => {
     const target = event.currentTarget;
     users.forEach((user, idx) => {
@@ -7,71 +12,35 @@
     });
   }
 
-  const users = reactive([
-      {
-        name: '원대로',
-        tel: '010-8580-5167',
-        userCde: 1,
-        maxLentCnt: 5,
-        lentCnt: 3,
-        showList: false,
-        books: [
-          {
-            title: '책1',
-            bookCde: '[EM00004375]',
-            authorCde: '한74ㄷ',
-            classfied: 321.5,
-            author: '한정선 지음',
-            pub: '김영사',
-          }
-        ]
-      },
-      {
-        name: '원대로',
-        tel: '010-8580-5167',
-        userCde: 2,
-        maxLentCnt: 5,
-        lentCnt: 3,
-        showList: false,
-        books: [
-          {
-            title: '책1',
-            bookCde: '[EM00004375]',
-            authorCde: '한74ㄷ',
-            classfied: 321.5,
-            author: '한정선 지음',
-            pub: '김영사',
-          }
-        ]
-      },
-      {
-        name: '원대로',
-        tel: '010-8580-5167',
-        userCde: 3,
-        maxLentCnt: 5,
-        lentCnt: 0,
-        books: []
-      },
-      {
-        name: '원대로',
-        tel: '010-8580-5167',
-        userCde: 4,
-        maxLentCnt: 5,
-        lentCnt: 4,
-        showList: false,
-        books: [
-          {
-            title: '책1',
-            bookCde: '[EM00004375]',
-            authorCde: '한74ㄷ',
-            classfied: 321.5,
-            author: '한정선 지음',
-            pub: '김영사',
-          }
-        ]
-      }
-    ]
-  );
+  const state = reactive({
+    userList: [],
+    totalCnt: 0,
+    searchOpt: {
+      keyword: '',
+      lentSts: '',
+      page: 1,
+      listPerPage: 10
+    },
+  });
+
+  const getUserList = () => {
+    let param = '';
+
+    // axios.get(`http://localhost:3000/getUserList?page=1&listPerPage=10`).then((res) => {
+    axios.get(`http://localhost:3000/getUserList?${commonJS.objToURLParam(state.searchOpt)}`).then((res) => {
+      const { data } = res;
+
+      state.userList = data.data;
+      state.totalCnt = data.total;
+    });
+  }
+
+  getUserList();
+
+  const getUserListByPage = (page) => {
+    state.searchOpt.page = page;
+    getUserList();
+  }
 </script>
 
 <template>
@@ -82,7 +51,7 @@
         <div class="row">
           <label class="col">
             <span class="title">검색어</span>
-            <input type="text" placeholder="회원명, 연락처"/>
+            <input type="text" placeholder="회원명, 연락처" v-model="state.searchOpt.keyword" @keyup.enter="getUserList" />
           </label>
         </div>
         <div class="row">
@@ -103,25 +72,27 @@
           </div>
         </div>
         <div class="row btns">
-          <button class="btn-form btn-search">검색</button>
+          <button class="btn-form btn-search" @click="getUserList">검색</button>
         </div>
       </div>
     </div>
     <div class="white-box list-wrapper">
       <header>
         <div>
-          총 <strong>0</strong>건
+          총 <strong>{{ state.totalCnt }}</strong>명
         </div>
         <div class="btns">
         </div>
 
       </header>
       <ul class="list">
-        <li v-for="user in users" :key="user">
+        <li v-for="user in state.userList" :key="user">
           <div class="top">
             <div class="left">
-              <strong class="user-name">{{ user.name }}</strong>
-              <span class="user-cde">[{{ user.userCde }}]</span>
+              <RouterLink :to="`/admin/user1/${user.user_cde}`">
+                <strong class="user-name">{{ user.name || '이름없음' }}</strong>
+                <span class="user-cde">[{{ user.user_cde }}]</span>
+              </RouterLink>
             </div>
             <div class="right">
               대여현황: <strong>{{ user.lentCnt }}</strong> / <strong>{{ user.maxLentCnt }}</strong>
@@ -166,11 +137,7 @@
           </div>
         </li>
       </ul>
-      <ul class="pagination">
-        <li>이전</li>
-        <li v-for="n in 10">{{ n }}</li>
-        <li>이후</li>
-      </ul>
+      <Pagination :fnc="getUserListByPage" :totalCnt="state.totalCnt"></Pagination>
     </div>
   </article>
 </template>
@@ -246,6 +213,8 @@
       & > li:hover{
         background: var(--color-green);
         color: #fff;
+
+        
       }
 
       li{
@@ -258,7 +227,13 @@
         box-shadow: 0 3px 5px rgba(0, 0, 0, .2);
 
 
-        &:last-child{border-bottom: 0;}
+        &:last-child{margin-bottom: 0;}
+
+        &:hover .top .left a{
+          color: #fff;
+        }
+
+        
 
         .top{
           display: flex;
@@ -273,6 +248,12 @@
             width: 10px;
             white-space: nowrap;
             overflow: hidden;
+
+            a{
+              display: block;
+              text-decoration: none;
+              color: #000;
+            }
             .book-cde{margin-right: 5px;}
             .book-title{flex: 1;}
           }

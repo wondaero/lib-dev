@@ -1,7 +1,19 @@
 <script setup>
   import { reactive, ref, nextTick } from 'vue';
+  import axios from 'axios';
 
-  const bookPop = ref(null);
+  import Pagination from '../../components/Pagination.vue'
+
+  const state = reactive({
+    bookList: [],
+    totalCnt: 0,
+    searchOpt: {
+      keyword: '',
+      bookSts: '',
+      page: 1,
+      listPerPage: 10
+    },
+  });
 
   const returnBook = () => {
     if(confirm('반납하시겠습니까?')){
@@ -12,8 +24,19 @@
     }
   };
 
-  const preventLink = (event) => {
-    event.stopPropagation();
+
+  const getBookList = () => {
+    axios.post("http://localhost:3000/getBookList", state.searchOpt).then((res) => {
+      state.bookList = res.data.data;
+      state.totalCnt = res.data.total;
+    });
+  }
+
+  getBookList();
+
+  const getBookListByPage = (page) => {
+    state.searchOpt.page = page;
+    getBookList();
   }
 
 </script>
@@ -25,47 +48,44 @@
         <div class="row">
           <label class="col">
             <span class="title">검색어</span>
-            <input type="text" placeholder="도서명, 저자, 출판사, 도서코드" />
+            <input type="text" placeholder="도서명, 저자, 출판사, 도서코드" v-model="state.searchOpt.keyword" @keyup.enter="getBookList"/>
           </label>
         </div>
         <div class="row">
           <div class="title col">도서상태</div>
           <div class="col">
             <label class="radio-custom">
-              <input type="radio" name="bookStatus" checked/>
+              <input type="radio" name="bookSts" v-model="state.searchOpt.bookSts" value="전체" checked/>
               <strong>전체</strong>
             </label>
             <label class="radio-custom">
-              <input type="radio" name="bookStatus"/>
+              <input type="radio" name="bookSts" v-model="state.searchOpt.bookSts" value="대여중" />
               <strong>대여중</strong>
             </label>
             <label class="radio-custom">
-              <input type="radio" name="bookStatus"/>
+              <input type="radio" name="bookSts" v-model="state.searchOpt.bookSts" value="보류" />
               <strong>보류</strong>
             </label>
           </div>
         </div>
         <div class="row btns">
-          <button class="btn-form btn-search">검색</button>
+          <button class="btn-form btn-search" @click="getBookList">검색</button>
         </div>
       </div>
     </div>
     <div class="white-box list-wrapper">
       <header>
-        <div>
-          총 <strong>0</strong>건
-        </div>
-        <div class="btns">
-        </div>
+        <div class="btns"></div>
+        <div>총 <strong>{{ state.totalCnt }}</strong>건</div>
 
       </header>
       <ul class="list">
-        <li v-for="n in 2">
-          <RouterLink to="/admin/book1">
-          <div class="top">
+        <li v-for="(book, idx) in state.bookList" :key="idx">
+          <RouterLink :to="`/admin/book1/${book.book_cde}`">
+            <div class="top">
               <div class="left">
-                <strong class="book-cde">[EM00004375]</strong>
-                <span class="book-title txt-overflow1">프리젠테이션 오!프리젠테이션</span>
+                <strong class="book-cde">[{{ book.book_cde }}]</strong>
+                <span class="book-title txt-overflow1">{{ book.title }}</span>
               </div>
               <div class="right">
                 <strong>연체중</strong>
@@ -74,26 +94,21 @@
             </div>
             <div class="bottom">
               <div class="left">
-                <span>한정선 지음</span>|<span>김영사</span>
+                <span>{{ book.author }}</span> {{book.author && book.pub ? '|' : ''}} <span>{{ book.pub }}</span>
               </div>
               <div class="right">
-                <strong>[325.1]</strong>
-                <strong>한74ㅍ</strong>
+                <strong class="class-no">[{{ book.class_no }}]</strong> <strong>{{ book.class_cde }}</strong>
               </div>
             </div>
           </RouterLink>
-          <div class="option" @click.capture="preventLink">
+          <div class="option">
             <input type="date"/>
-            <button class="btn-form btn-extend" @click.prevent="extendDate">연장</button>
-            <button class="btn-form btn-return" @click.prevent="returnBook">반납</button>
+            <button class="btn-form btn-extend" @click="extendDate">연장</button>
+            <button class="btn-form btn-return" @click="returnBook">반납</button>
           </div>
         </li>
       </ul>
-      <ul class="pagination">
-        <li>이전</li>
-        <li v-for="n in 10">{{ n }}</li>
-        <li>이후</li>
-      </ul>
+      <Pagination :fnc="getBookListByPage" :totalCnt="state.totalCnt"></Pagination>
     </div>
   </article>
 </template>
@@ -144,9 +159,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding-bottom: 10px;
       margin-bottom: 10px;
-      border-bottom: 1px solid #ccc;
     }
 
     .list{
@@ -156,19 +169,17 @@
 
       list-style: none;
       margin: 0;
-      padding: 0;
-
       padding: 10px;
 
+      border-top: 1px solid #ccc;
       border-bottom: 1px solid #ccc;
 
       margin-bottom: 10px;
 
       li{
-
         background: #fafbfc;
         border-radius: 10px;
-        padding: 20px;
+        padding: 10px;
         border: 1px solid #ddd;
         margin-bottom: 10px;
         transition: color .5s;
@@ -183,6 +194,12 @@
           a{
             color: #fff;
             background: 0;
+
+            .bottom{
+              .class-no{
+                color: darkviolet;
+              }
+            }
           }
         }
 
@@ -216,6 +233,9 @@
             .left{
               flex: 1;
               margin-right: 5px;
+            }
+            .class-no{
+              color: #42c7d5;
             }
           }
   
@@ -259,6 +279,8 @@
 
   }
 }
+
+
   
 
 </style>
