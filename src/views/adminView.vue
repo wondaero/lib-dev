@@ -44,7 +44,7 @@
               <ul>
                 <li><RouterLink to="/admin/borrowedBookList">대여 목록</RouterLink></li>
                 <li><RouterLink to="/admin/borrow">대여</RouterLink></li>
-                <li>반납</li>
+                <li><RouterLink to="/admin/return1">반납</RouterLink></li>
               </ul>
             </li>
             <li>

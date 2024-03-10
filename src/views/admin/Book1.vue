@@ -38,7 +38,7 @@
         isbn: data[0].isbn,
         startVol: data[0].start_vol,
         classCdeChk: data[0].class_cde_chk,
-        regDt: new Date(data[0].reg_dt).toLocaleDateString()
+        regDt: new Date(data[0].reg_dt).toLocaleDateString(),
       }
     });
   }
@@ -84,7 +84,7 @@
       const xmlDoc = parser.parseFromString(data, "text/xml");
       const book = commonJS.xmlToObjArr({xml: xmlDoc, tagName: 'BIBINFO'})[0];
 
-      state.bookDetail = {...state.booksByIsbn[idx], ...commonJS.getClassifiedBookInfo(book)};
+      state.bookDetail = {...state.booksByIsbn[idx], ...commonJS.getClassifiedBookInfo(book), sts: 1};
     });
   }
 
@@ -256,7 +256,11 @@
         <div class="row">
           <label class="col">
             <span class="title">도서상태</span>
-            <input type="text" />
+            <select v-model="state.bookDetail.sts">
+              <option value="1">대여가능</option>
+              <option value="3">대여불가</option>
+              <option value="4">보류</option>
+            </select>
           </label>
         </div>
         <div class="row">

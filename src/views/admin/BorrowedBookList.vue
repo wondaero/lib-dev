@@ -1,3 +1,34 @@
+<script setup>
+  import { reactive, ref, nextTick } from 'vue';
+  import axios from 'axios';
+  import commonJS from '../../assets/common';
+  import Pagination from '../../components/Pagination.vue'
+
+  const state = reactive({
+    bookList: [],
+    totalCnt: 0,
+    searchOpt: {
+      keyword: '',
+      lentSts: '',
+      page: 1,
+      listPerPage: 10
+    },
+  });
+
+  const getUserList = () => {
+    let param = '';
+
+    axios.get(`http://localhost:3000/getBorrowedBookList?`).then((res) => {
+      const { data } = res;
+      console.log(data);
+
+      // state.userList = data.data;
+      // state.totalCnt = data.total;
+    });
+  }
+
+  // getUserList();
+</script>
 <template>
   <article class="lent-book-list-page">
     <h1>대여 목록</h1>

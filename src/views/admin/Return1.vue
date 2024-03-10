@@ -2,7 +2,6 @@
   import { reactive, ref, nextTick } from 'vue';
   import axios from 'axios';
   import commonJS from '../../assets/common';
-  import { useRouter } from 'vue-router';
 
   const userInput = ref(null);
   const bookCdeInput = ref(null);
@@ -11,7 +10,7 @@
   const bookList = ref(null);
   // const allChkInput = ref(null);
 
-  const state = reactive({
+  const state2 = reactive({
     showedPopup: false,
     userList: [],
     selectedUser: '',   //유저 선택시 object로 바꾸기{}
@@ -21,52 +20,44 @@
     checkedBook: [],
     allChked: true
   });
+  const state = reactive({
+    bookCde: '',
+    borrowedBooks: [],
+  });
 
-  const router = useRouter();
-  const curUserCde = router.currentRoute.value.params.user_cde;
-
-  const getUserList = () => {
-    state.selectedUser = '';
-    let param = '';
-
-    axios.post(`http://localhost:3000/getUserListFromBorrow`, {
-      userKeyword: state.userKeyword
-    }).then((res) => {
-      const { data } = res;
-
-      if(!data.length){
-        alert('해당 유저가 존재하지않습니다.');
+  const getBeingBorrowedBook = () => {
+    axios.post(`http://localhost:3000/getBeingBorrowedBook`, {
+      bookCde: state.bookCde
+    }).then(res => {
+      if(!res.data.length){
+        alert('도서코드를 확인해주세요.\n(이미 반납되었거나 빌린적이 없는 책일 수도 있습니다.)');
         return;
-      }else if(data.length === 1){
-        state.selectedUser = data[0];
-      }else{
-        state.showedPopup = true;
-        state.userList = data;
-
-        nextTick(() => {
-          setTimeout(() => {
-            userPop._value.classList.add('effect');
-          });
-        });
       }
-    });
+      // state.checkedBook.push(res.data[0].book_cde);
+      // state.bookList.push(res.data[0]);
+
+      const bookObj = res.data[0];
+      bookObj.chked = true;
+      
+      var today = new Date();
+      today.setDate(today.getDate() + 14);
+      bookObj.due = setYYYYMMDD(today);
+
+      state.bookList.push(bookObj);
+
+      console.log(state.bookList);
+
+      chkEach();
+    }).catch(e => {
+      console.error(e);
+    })
+
   }
 
-  const togglePopup = (bool) => {
-    if(bool === undefined) state.showedPopup = !state.showedPopup;
-    else if(typeof bool === 'boolean') state.showedPopup = bool;
-  }
 
-  const setUser = () => {
-    const target = userList._value.querySelector('input:checked');
-    if(!target){
-      alert('선택된 회원이 없습니다.');
-      return;
-    }
-    state.selectedUser = state.userList[userList._value.querySelector('input:checked').value];
+  
+  ////
 
-    togglePopup();
-  }
 
   const getBookInfo = () => {
     if(state.bookList.filter(x => x.book_cde === state.bookCde).length){
@@ -155,27 +146,31 @@
   }
 
   const borrow1 = (cde) => {
-    const book = state.bookList.filter(x => x.book_cde === cde)[0];
+    // nextTick(() => {
+      console.log('single');
+      const book = state.bookList.filter(x => x.book_cde === cde)[0];
 
-    if(state.selectedUser.cur_borrowing_cnt + 1 > state.selectedUser.borrowing_limit){ //필터
-      alert('최대 대여수를 넘길 수 없습니다.');
-      return;
-    }
+      if(state.selectedUser.cur_borrowing_cnt + 1 > state.selectedUser.borrowing_limit){ //필터
+        alert('최대 대여수를 넘길 수 없습니다.');
+        return;
+      }
+      
+      axios.post(`http://localhost:3000/borrow1`, {
+        books: [{
+          bookCde: book.book_cde,
+          userCde: state.selectedUser.user_cde,
+          rtnDate: book.due,
+        }]
+      }).then((res) => {
+        alert('대여되었습니다.');
+        state.bookList = state.bookList.filter(x => x.book_cde !== cde);
+        state.selectedUser.cur_borrowing_cnt += 1;
+      }).catch((err) => {
+        console.log(err);
+        alert('관리자에게 문의해주세요.');
+      });
+    // })
     
-    axios.post(`http://localhost:3000/borrow1`, {
-      books: [{
-        bookCde: book.book_cde,
-        userCde: state.selectedUser.user_cde,
-        rtnDate: book.due,
-      }]
-    }).then((res) => {
-      alert('대여되었습니다.');
-      state.bookList = state.bookList.filter(x => x.book_cde !== cde);
-      state.selectedUser.cur_borrowing_cnt += 1;
-    }).catch((err) => {
-      console.log(err);
-      alert('관리자에게 문의해주세요.');
-    });
   }
 
   const borrow2 = () => {
@@ -206,19 +201,19 @@
 
 </script>
 <template>
-  <article class="borrow-page">
-    <h1>도서 대여</h1>
+  <article class="return-page">
+    <h1>도서 반납</h1>
     <div class="white-box step1">
       <div class="grid">
         <div class="row">
           <label class="col with-btn">
-            <span class="title ast">회원</span>
-            <input ref="userInput" type="text" placeholder="회원명, 연락처" @keyup.enter="getUserList" v-model="state.userKeyword" />
-            <button class="btn-form btn-search" @click="getUserList">검색</button>
+            <span class="title ast">도서</span>
+            <input ref="userInput" type="text" placeholder="도서코드" @keyup.enter="getBeingBorrowedBook" v-model="state.bookCde" />
+            <button class="btn-form btn-search" @click="getBeingBorrowedBook">검색</button>
           </label>
         </div>
       </div>
-      <div class="user-info whte-box" v-if="typeof state.selectedUser === 'object'">
+      <div class="user-info whte-box" v-if="state.borrowedBooks.length">
         <div class="top">
           <strong class="txt-overflow1">{{ state.selectedUser.name }} [{{ state.selectedUser.user_cde }}]</strong>
           <strong :class="{over: (state.selectedUser.cur_borrowing_cnt >= state.selectedUser.borrowing_limit)}">
@@ -279,46 +274,12 @@
         </ul>
       </div>
     </div>
-    <aside class="layer" v-if="state.showedPopup">
-      <div class="popup-user" ref="userPop">
-        <header>
-          <h1>유저정보</h1>
-          <span class="btn-close" @click="togglePopup();">
-            <span></span>
-            <span></span>
-          </span>
-        </header>
-        <div class="btns">
-          <button class="btn-form" @click="setUser">선택</button>
-        </div>
-        <ul ref="userList">
-          <li v-for="(user, idx) in state.userList" :key="idx" :class="{disabled: (user.cur_borrowing_cnt >= user.borrowing_limit)}">
-            <label>
-              <input
-                type="radio"
-                name="user"
-                :checked="idx === 0 && user.cur_borrowing_cnt < user.borrowing_limit"
-                :disabled="user.cur_borrowing_cnt >= user.borrowing_limit"
-                :value="idx"
-              />
-              <div class="white-box">
-                <div class="top">
-                    <strong class="txt-overflow1">{{ user.name }} [{{ user.user_cde }}]</strong>
-                    <span>대여현황 {{ user.cur_borrowing_cnt }} / {{ user.borrowing_limit }}</span>
-                </div>
-                <div class="bottom">{{ user.tel }}</div>
-              </div>
-            </label>
-          </li>
-        </ul>
-      </div>
-    </aside>
   </article>
   
 </template>
 
 <style lang="scss" scoped>
-.borrow-page{
+.return-page{
   display: flex;
   flex-direction: column;
 
@@ -489,6 +450,8 @@
   
         border-top: 1px solid #ccc;
   
+        margin-bottom: 10px;
+  
         li{
 
           margin-bottom: 10px;
@@ -575,140 +538,6 @@
 
   h1{font-size: 20px; margin-bottom: 10px;}
 
-  .layer{
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, .5);
-    
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    .popup-user{
-      max-width: 800px;
-      width: 100%;
-      background: #fff;
-      border-radius: 10px;
-      padding: 10px;
-
-      transform: scale(0);
-      transition: transform 0.3s cubic-bezier(0.29, 0.42, 0.27, 1.55);
-
-      &.effect{transform: scale(1);}
-
-      header{
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        border-bottom: 1px solid #eee;
-        padding-bottom: 5px;
-        margin-bottom: 5px;
-
-        h1{margin: 0;}
-        .btn-close{
-          width: 20px;
-          height: 20px;
-          position: relative;
-
-          transform: rotate(45deg);
-          cursor: pointer;
-
-          span{
-            display: inline-block;
-            vertical-align: top;
-
-            background: var(--color-red);
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 0 5px var(--color-red);
-          }
-          span:first-of-type{
-            width: 20px;
-            height: 5px;
-          }
-          span:last-of-type{
-            width: 5px;
-            height: 20px;
-          }
-        }
-      }
-
-      .btns{
-        display: flex;
-        justify-content: flex-end;
-        margin-bottom: 5px;
-
-        button{
-          background: var(--color-green);
-          color: #fff;
-        }
-      }
-
-      ul{
-        margin: 0;
-        padding: 10px;
-        max-height: 280px;
-        border-top: 1px solid #eee;
-        border-bottom: 1px solid #eee;
-        overflow-y: auto;
-        li{
-          margin-bottom: 5px;
-
-          &.disabled{
-            opacity: .5;
-
-            label{
-              cursor: not-allowed;
-              span{color: #f00;}
-            }
-          }
-
-          &:last-of-type{
-            margin-bottom: 0;
-          }
-          .white-box{
-            padding: 5px 10px;
-          }
-          label{
-            display: block;
-            cursor: pointer;
-
-            input{display: none;}
-
-            input:checked + div{
-              background: var(--color-green);
-              color: #fff;
-            }
-
-            .top{
-              display: flex;
-              align-items: center;
-              justify-content: space-between;
-
-              strong{flex: 1;}
-
-              
-            }
-            .bottom{
-              display: flex;
-              align-items: center;
-              justify-content: space-between;
-
-              .author-pub{
-                flex: 1;
-                margin-right: 5px;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
 }
   
 

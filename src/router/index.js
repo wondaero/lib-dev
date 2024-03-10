@@ -8,6 +8,7 @@ import Book1 from '../views/admin/Book1.vue'
 import BookListWithNoClassCde from '../views/admin/BookListWithNoClassCde.vue'
 import BorrowedBookList from '../views/admin/BorrowedBookList.vue'
 import Borrow from '../views/admin/Borrow.vue'
+import Return1 from '../views/admin/Return1.vue'
 import UserList from '../views/admin/UserList.vue'
 import User1 from '../views/admin/User1.vue'
 
@@ -66,6 +67,11 @@ const router = createRouter({
           path: 'borrow',
           name: 'borrow',
           component: Borrow
+        },
+        {
+          path: 'return1',
+          name: 'return1',
+          component: Return1
         },
         {
           path: 'bookListWithNoClassCde',
