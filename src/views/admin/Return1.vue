@@ -17,46 +17,42 @@
     userKeyword: '',
     bookCde: '',
     bookList: [],
-    checkedBook: [],
     allChked: true
   });
   const state = reactive({
     bookCde: '',
     borrowedBooks: [],
+    allChked: true
   });
 
   const getBeingBorrowedBook = () => {
+    if(state.borrowedBooks.filter(x => x.book_cde === state.bookCde).length){
+      alert('이미 목록에 있습니다.');
+      return;
+    }
+
     axios.post(`http://localhost:3000/getBeingBorrowedBook`, {
       bookCde: state.bookCde
     }).then(res => {
-      if(!res.data.length){
+      if(!res.data[0].length){
         alert('도서코드를 확인해주세요.\n(이미 반납되었거나 빌린적이 없는 책일 수도 있습니다.)');
         return;
       }
-      // state.checkedBook.push(res.data[0].book_cde);
-      // state.bookList.push(res.data[0]);
 
-      const bookObj = res.data[0];
+      const bookObj = res.data[0][0];
       bookObj.chked = true;
-      
-      var today = new Date();
-      today.setDate(today.getDate() + 14);
-      bookObj.due = setYYYYMMDD(today);
+      bookObj.org_return_dt = setYYYYMMDD(bookObj.org_return_dt);
+      bookObj.reg_dt = setYYYYMMDD(bookObj.reg_dt);
 
-      state.bookList.push(bookObj);
+      state.borrowedBooks.push(bookObj);
 
-      console.log(state.bookList);
-
-      chkEach();
+      // chkEach();
     }).catch(e => {
       console.error(e);
     })
-
   }
 
-
   
-  ////
 
 
   const getBookInfo = () => {
@@ -72,8 +68,6 @@
         alert('이미 대여중인 도서이거나\n존재하지 않는 도서입니다.');
         return;
       }
-      // state.checkedBook.push(res.data[0].book_cde);
-      // state.bookList.push(res.data[0]);
 
       const bookObj = res.data[0];
       bookObj.chked = true;
@@ -104,7 +98,6 @@
     chkEach();
   }
   const del2 = () => {
-    // if(!state.checkedBook.length){
     if(!state.bookList.filter(x => x.chked).length){
       alert('선택된 도서가 없습니다.');
       return;
@@ -131,6 +124,7 @@
 
   const setYYYYMMDD = d => new Date(d).toLocaleDateString().split(' ').map(dd => parseInt(dd) < 10 ? '0' + parseInt(dd) : parseInt(dd)).join('-');
 
+  const isOver = rtnDt => (new Date(rtnDt) - new Date()) < 0;
 
   const chkAll = () => {
     state.bookList.map(x => x.chked = state.allChked);
@@ -213,39 +207,21 @@
           </label>
         </div>
       </div>
-      <div class="user-info whte-box" v-if="state.borrowedBooks.length">
-        <div class="top">
-          <strong class="txt-overflow1">{{ state.selectedUser.name }} [{{ state.selectedUser.user_cde }}]</strong>
-          <strong :class="{over: (state.selectedUser.cur_borrowing_cnt >= state.selectedUser.borrowing_limit)}">
-            대여현황 {{ state.selectedUser.cur_borrowing_cnt }} / {{ state.selectedUser.borrowing_limit }}
-          </strong>
-        </div>
-        <div class="bottom">{{ state.selectedUser.tel }}</div>
-      </div>
     </div>
-    <div class="white-box step2" v-if="typeof state.selectedUser === 'object'">
-      <div class="grid">
-        <div class="row">
-          <label class="col with-btn">
-            <span class="title ast">도서</span>
-            <input type="text" ref="bookCdeInput" placeholder="도서코드" @keyup.enter="getBookInfo" v-model="state.bookCde" />
-            <button class="btn-form btn-search" @click="getBookInfo">검색</button>
-          </label>
-        </div>
-      </div>
-      <div class="white-box list-wrapper"  v-if="state.bookList.length > 0">
+    <div class="white-box step2" v-if="state.borrowedBooks.length > 0">
+      <div class="list-wrapper">
         <div class="list-top">
           <div class="left">
             <input type="checkbox" @change="chkAll()" v-model="state.allChked">
-            <div>{{ state.bookList.filter(x => x.chked).length }} / {{ state.bookList.length }}</div>
+            <div>{{ state.borrowedBooks.filter(x => x.chked).length }} / {{ state.borrowedBooks.length }}</div>
           </div>
           <div class="right">
             <button class="btn-form del" @click="del2">선택제거</button>
-            <button class="btn-form" @click="borrow2()">선택대여</button>
+            <button class="btn-form" @click="borrow2()">선택반납</button>
           </div>
         </div>
         <ul class="list" ref="bookList">
-          <li v-for="(book, idx) in state.bookList" :key="idx">
+          <li v-for="(book, idx) in state.borrowedBooks" :key="idx">
             <label>
               <input type="checkbox" @change="chkedBookCtrl($event, book.book_cde)" v-model="book.chked">
               <div>
@@ -254,19 +230,27 @@
                     <strong class="book-cde">[{{ book.book_cde }}]</strong>
                     <span class="book-title txt-overflow1">{{ book.title }}</span>
                   </div>
-                  <div class="right">
-                    <strong class="class-no">[{{ book.class_no }}]</strong> <strong>{{ book.class_cde }}</strong>
+                  <div class="right" :class="{over: isOver(book.org_return_dt)}">
+                    <strong class="class-no">{{ isOver(book.org_return_dt) ? '연체중' : '대여중' }}</strong><strong>({{ book.name }})</strong>
                   </div>
                 </div>
                 <div class="bottom">
                   <div class="left">
                     <span>{{ book.author }}</span> {{book.author && book.pub ? '|' : ''}} <span>{{ book.pub }}</span>
                   </div>
+                  <div class="right">
+                    <strong class="class-no">[{{ book.class_no }}]</strong> <strong>{{ book.class_cde }}</strong>
+                  </div>
                 </div>
                 <div class="option">
-                  <input type="date" v-model="book.due"/>
-                  <button class="btn-form" @click="borrow1(book.book_cde)">대여</button>
-                  <button class="btn-form del" @click="del(idx)">제거</button>
+                  <div class="left">
+                    <strong>{{ book.reg_dt }} ~</strong>
+                  </div>
+                  <div class="right">
+                    <input type="date" v-model="book.org_return_dt" />
+                    <button class="btn-form" @click="borrow1(book.book_cde)">반납</button>
+                    <button class="btn-form del" @click="del(idx)">제거</button>
+                  </div>
                 </div>
               </div>
             </label>
@@ -339,22 +323,6 @@
       background: #ace;
       transform: translateY(-50%);
       font-weight: bold;
-    }
-
-    .user-info{
-      border-top: 1px solid #eee;
-      margin-top: 10px;
-      padding: 10px 0 0;
-
-      .top{
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-
-        .over{
-          color: #f00;
-        }
-      }
     }
   }
 
@@ -478,6 +446,10 @@
             &:hover{
               background: var(--color-green);
               color: #fff;
+
+              .bottom .class-no{
+                color: darkviolet;
+              }
             }
     
               
@@ -496,31 +468,36 @@
                 .book-cde{margin-right: 5px;}
                 .book-title{flex: 1;}
               }
-              .right{
-  
+              .right.over{
+                animation: blink .5s infinite linear alternate;
               }
             }
       
-              .bottom{
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-      
-                .left{
-                  flex: 1;
-                  margin-right: 5px;
-                }
-                .class-no{
-                  color: #42c7d5;
-                }
+            .bottom{
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+    
+              .left{
+                flex: 1;
+                margin-right: 5px;
               }
+              .class-no{
+                color: #42c7d5;
+              }
+            }
       
             .option{
               display: flex;
-              justify-content: flex-end;
+              justify-content: space-between;
+              align-items: center;
               margin-top: 10px;
               padding-top: 10px;
               border-top: 1px dashed #eee;
+              
+              .right{
+                display: flex;
+              }
 
               .del{
                 background: var(--color-red);
@@ -538,6 +515,15 @@
 
   h1{font-size: 20px; margin-bottom: 10px;}
 
+}
+
+@keyframes blink{
+  0%{
+    color: transparent;
+  }
+  100%{
+    color: var(--color-red);
+  }
 }
   
 

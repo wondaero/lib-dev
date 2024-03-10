@@ -18,7 +18,6 @@
     userKeyword: '',
     bookCde: '',
     bookList: [],
-    checkedBook: [],
     allChked: true
   });
 
@@ -81,8 +80,6 @@
         alert('이미 대여중인 도서이거나\n존재하지 않는 도서입니다.');
         return;
       }
-      // state.checkedBook.push(res.data[0].book_cde);
-      // state.bookList.push(res.data[0]);
 
       const bookObj = res.data[0];
       bookObj.chked = true;
@@ -113,7 +110,6 @@
     chkEach();
   }
   const del2 = () => {
-    // if(!state.checkedBook.length){
     if(!state.bookList.filter(x => x.chked).length){
       alert('선택된 도서가 없습니다.');
       return;
@@ -238,7 +234,7 @@
           </label>
         </div>
       </div>
-      <div class="white-box list-wrapper"  v-if="state.bookList.length > 0">
+      <div class="list-wrapper"  v-if="state.bookList.length > 0">
         <div class="list-top">
           <div class="left">
             <input type="checkbox" @change="chkAll()" v-model="state.allChked">
