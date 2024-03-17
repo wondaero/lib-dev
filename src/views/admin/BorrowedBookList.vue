@@ -15,19 +15,78 @@
     },
   });
 
-  const getUserList = () => {
-    let param = '';
+  const getBorrowedBookList = () => {
 
-    axios.get(`http://localhost:3000/getBorrowedBookList?`).then((res) => {
+    axios.get(`http://localhost:3000/getBorrowedBookList?${commonJS.objToURLParam(state.searchOpt)}`).then((res) => {
       const { data } = res;
-      console.log(data);
+      state.bookList = data.list;
+      state.totalCnt = data.listCnt;
 
-      // state.userList = data.data;
-      // state.totalCnt = data.total;
+      let elem;
+      let rtnDt;
+      let orgRtnDt;
+      let sts;
+      let stsClass;
+
+      state.bookList.forEach((el, idx) => {
+        elem = state.bookList[idx];
+        rtnDt = commonJS.setYYYYMMDD(el.return_dt);
+        orgRtnDt = commonJS.setYYYYMMDD(el.org_return_dt);
+        if(el.return_dt){
+          if(rtnDt <= orgRtnDt){
+            sts = '반납';
+            stsClass = 'ed';
+          }else{
+            sts = '연체반납';
+            stsClass = 'overed';
+          }
+        }else{
+          if(commonJS.setYYYYMMDD(new Date()) <= orgRtnDt) {
+            sts = '대여중';
+            stsClass = 'ing';
+          }else{
+            sts = '연체중';
+            stsClass = 'overing';
+          }
+        }
+
+        elem.sts = sts;
+        elem.stsClass = stsClass;
+      })
     });
   }
 
-  // getUserList();
+  getBorrowedBookList();
+
+  const getBorrowedBookListByPage = (page) => {
+    state.searchOpt.page = page;
+    getBorrowedBookList();
+  }
+
+  const return1 = (seq, bookCde, userCde) => {
+    if(!confirm('해당도서를 반납하시겠습니까?')) return;
+
+    if(seq === undefined ||  bookCde === undefined || userCde === undefined){ //필터
+      alert('[bbl001] 반납을 진행할 수 없습니다.\n관리자에게 문의해주세요.');
+      return;
+    }
+
+
+    
+    axios.post(`http://localhost:3000/return1`, {
+      books: [{
+        seq,
+        book_cde: bookCde,
+        user_cde: userCde
+      }]
+    }).then((res) => {
+      alert('반납되었습니다.');
+      getBorrowedBookList();
+    }).catch((err) => {
+      console.log(err);
+      alert('[bbl002] 관리자에게 문의해주세요.');
+    });
+  }
 </script>
 <template>
   <article class="lent-book-list-page">
@@ -37,22 +96,22 @@
         <div class="row">
           <label class="col">
             <span class="title">검색어</span>
-            <input type="text" class=""/>
+            <input type="text" class="" v-model="state.searchOpt.keyword" @keyup.enter="getBorrowedBookList" />
           </label>
         </div>
         <div class="row">
           <div class="title col">대여상태</div>
           <div class="col">
             <label class="radio-custom">
-              <input type="radio" name="bookStatus" checked/>
+              <input type="radio" name="bookStatus" value="" v-model="state.searchOpt.lentSts" checked/>
               <strong>전체</strong>
             </label>
             <label class="radio-custom">
-              <input type="radio" name="bookStatus"/>
+              <input type="radio" name="bookStatus" value="ing" v-model="state.searchOpt.lentSts" />
               <strong>대여중</strong>
             </label>
             <label class="radio-custom">
-              <input type="radio" name="bookStatus"/>
+              <input type="radio" name="bookStatus" value="over" v-model="state.searchOpt.lentSts" />
               <strong>연체중</strong>
             </label>
           </div>
@@ -66,52 +125,48 @@
           </label>
         </div>
         <div class="row btns">
-          <button class="btn-form btn-search">검색</button>
+          <button class="btn-form btn-search" @click="getBorrowedBookList" >검색</button>
         </div>
       </div>
     </div>
     <div class="white-box list-wrapper">
       <header>
         <div>
-          총 <strong>0</strong>건
+          총 <strong>{{ state.totalCnt }}</strong>건
         </div>
         <div class="btns">
         </div>
 
       </header>
       <ul class="list">
-        <li v-for="n in 2">
+        <li v-for="item in state.bookList" :key="item.seq">
           <div class="top">
             <div class="left">
-              <strong class="book-cde">[EM00004375]</strong>
-              <span class="book-title txt-overflow1">프리젠테이션 오!프리젠테이션</span>
+              <strong class="book-cde">[{{ item.book_cde }}]</strong>
+              <span class="book-title txt-overflow1">{{item.title}}</span>
             </div>
             <div class="right">
-              <strong>연체중</strong>
-              <strong>(원대로)</strong>
+              <strong :class="item.stsClass">{{ item.sts }}</strong>
+              <strong> ({{ item.name }})</strong>
             </div>
           </div>
           <div class="bottom">
             <div class="left">
-              <span>한정선 지음</span>|<span>김영사</span>
+              <span>{{ item.author }}</span> {{item.author && item.pub ? '|' : ''}} <span>{{ item.pub }}</span>
             </div>
             <div class="right">
-              <strong>[325.1]</strong>
-              <strong>한74ㅍ</strong>
+              <strong>[{{ item.class_no }}]</strong>
+              <strong>{{ item.class_cde }}</strong>
             </div>
           </div>
-          <div class="option">
-            <input type="date" />
+          <div class="option" v-if="item.sts === '대여중' || item.sts === '연체중'">
+            <input type="date" :value="commonJS.setYYYYMMDD(item.org_return_dt)"/>
             <button class="btn-form btn-extend">연장</button>
-            <button class="btn-form btn-return">반납</button>
+            <button class="btn-form btn-return" @click="return1(item.seq, item.book_cde, item.user_cde)">반납</button>
           </div>
         </li>
       </ul>
-      <ul class="pagination">
-        <li>이전</li>
-        <li v-for="n in 10">{{ n }}</li>
-        <li>이후</li>
-      </ul>
+      <Pagination :fnc="getBorrowedBookListByPage" :totalCnt="state.totalCnt"></Pagination>
     </div>
   </article>
 </template>
@@ -215,6 +270,26 @@
             overflow: hidden;
             .book-cde{margin-right: 5px;}
             .book-title{flex: 1;}
+          }
+
+          .right{
+            .ing{
+              color: #dad;
+              background: #fff;
+            }
+            .overing{
+              color: var(--color-red);
+              background: #fff;
+            }
+            .ed{
+              color: var(--color-green);
+              background: #fff;
+              
+            }
+            .overed{
+              color: var(--color-orange);
+              background: #fff;
+            }
           }
         }
 

@@ -32,17 +32,16 @@
         tel: data[0].tel,
         email: data[0].email,
         gender: data[0].gender,
-        birth: data[0].birth ? setYYYYMMDD(data[0].birth) : '',
+        birth: data[0].birth ? commonJS.setYYYYMMDD(data[0].birth) : '',
         addr: data[0].address,
         borrowingLimit: data[0].borrowing_limit,
         duePeriod: data[0].due_period,
 
-        regDt: setYYYYMMDD(data[0].reg_dt)
+        regDt: commonJS.setYYYYMMDD(data[0].reg_dt)
       }
     });
   }
 
-  const setYYYYMMDD = d => new Date(d).toLocaleDateString().split(' ').map(dd => parseInt(dd) < 10 ? '0' + parseInt(dd) : parseInt(dd)).join('-');
   
   const regUser = () => {
     if(!chkRequired()){

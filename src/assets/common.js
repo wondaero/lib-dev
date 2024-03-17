@@ -252,7 +252,9 @@ const methods = {
     }
 
     return tmpArr.join('&');
-  }
+  },
+
+  setYYYYMMDD: d => new Date(d).toLocaleDateString().split(' ').map(dd => parseInt(dd) < 10 ? '0' + parseInt(dd) : parseInt(dd)).join('-')
 }
 
 
@@ -260,5 +262,6 @@ export default {
   xmlToObjArr: methods.xmlToObjArr,
   getClassifiedBookInfo: methods.getClassifiedBookInfo,
   getClassCde: methods.getClassCde,
-  objToURLParam: methods.objToURLParam
+  objToURLParam: methods.objToURLParam,
+  setYYYYMMDD: methods.setYYYYMMDD
 }

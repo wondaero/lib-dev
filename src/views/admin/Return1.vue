@@ -1,6 +1,7 @@
 <script setup>
   import { reactive } from 'vue';
   import axios from 'axios';
+  import commonJS from '../../assets/common';
 
   const state = reactive({
     bookCde: '',
@@ -24,8 +25,8 @@
 
       const bookObj = res.data[0][0];
       bookObj.chked = true;
-      bookObj.org_return_dt = setYYYYMMDD(bookObj.org_return_dt);
-      bookObj.reg_dt = setYYYYMMDD(bookObj.reg_dt);
+      bookObj.org_return_dt = commonJS.setYYYYMMDD(bookObj.org_return_dt);
+      bookObj.reg_dt = commonJS.setYYYYMMDD(bookObj.reg_dt);
 
       state.borrowedBooks.push(bookObj);
 
@@ -67,7 +68,6 @@
     chkEach();
   }
 
-  const setYYYYMMDD = d => new Date(d).toLocaleDateString().split(' ').map(dd => parseInt(dd) < 10 ? '0' + parseInt(dd) : parseInt(dd)).join('-');
 
   const isOver = rtnDt => (new Date(rtnDt) - new Date()) < 0;
 

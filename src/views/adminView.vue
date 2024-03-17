@@ -201,7 +201,7 @@
       section{
         display: flex;
         flex-direction: column;
-        flex: 1 0 auto;
+        flex: 1;
   
         header{
           height: 50px;

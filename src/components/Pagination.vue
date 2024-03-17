@@ -25,6 +25,8 @@
   const calcCurPage = num => num + ((state.pageGroup - 1) * state.pagePerGroup);
 
   const calcPagesInGroup = totalCnt => {
+    if(!totalCnt) return 0;
+
     const groupCnt = Math.ceil(Math.ceil(totalCnt / state.listPerPage) / state.pagePerGroup);
 
     if(state.pageGroup < groupCnt) return state.pagePerGroup;

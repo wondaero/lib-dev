@@ -86,7 +86,7 @@
       
       var today = new Date();
       today.setDate(today.getDate() + 14);
-      bookObj.due = setYYYYMMDD(today);
+      bookObj.due = commonJS.setYYYYMMDD(today);
 
       state.bookList.push(bookObj);
 
@@ -133,8 +133,6 @@
 
     chkEach();
   }
-
-  const setYYYYMMDD = d => new Date(d).toLocaleDateString().split(' ').map(dd => parseInt(dd) < 10 ? '0' + parseInt(dd) : parseInt(dd)).join('-');
 
 
   const chkAll = () => {
