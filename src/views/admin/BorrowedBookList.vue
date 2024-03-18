@@ -22,6 +22,8 @@
       state.bookList = data.list;
       state.totalCnt = data.listCnt;
 
+      console.log(state.bookList);
+
       let elem;
       let rtnDt;
       let orgRtnDt;
@@ -30,8 +32,14 @@
 
       state.bookList.forEach((el, idx) => {
         elem = state.bookList[idx];
+
         rtnDt = commonJS.setYYYYMMDD(el.return_dt);
         orgRtnDt = commonJS.setYYYYMMDD(el.org_return_dt);
+
+        elem.return_dt = rtnDt;
+        elem.org_return_dt = orgRtnDt;
+        elem.reg_dt = commonJS.setYYYYMMDD(el.reg_dt);
+
         if(el.return_dt){
           if(rtnDt <= orgRtnDt){
             sts = '반납';
@@ -70,8 +78,6 @@
       alert('[bbl001] 반납을 진행할 수 없습니다.\n관리자에게 문의해주세요.');
       return;
     }
-
-
     
     axios.post(`http://localhost:3000/return1`, {
       books: [{
@@ -86,6 +92,23 @@
       console.log(err);
       alert('[bbl002] 관리자에게 문의해주세요.');
     });
+  }
+
+  const changeRtnDt = (seq) => {
+    if(!confirm('반납기간을 변경하시겠습니까?')) return;
+
+    const book = state.bookList.filter(x => x.seq === seq)[0];
+
+    axios.post(`http://localhost:3000/changeRtnDt`, {
+        seq,
+        rtnDt: book.org_return_dt
+      }).then((res) => {
+        alert('반납기간이 변경되었습니다.');
+        getBorrowedBookList();
+      }).catch((err) => {
+        console.log(err);
+        alert('[rtn003] 관리자에게 문의해주세요.');
+      });
   }
 </script>
 <template>
@@ -146,8 +169,7 @@
               <span class="book-title txt-overflow1">{{item.title}}</span>
             </div>
             <div class="right">
-              <strong :class="item.stsClass">{{ item.sts }}</strong>
-              <strong> ({{ item.name }})</strong>
+              <strong :class="item.stsClass">{{ item.sts }}</strong> <strong>({{ item.name }})</strong>
             </div>
           </div>
           <div class="bottom">
@@ -155,14 +177,13 @@
               <span>{{ item.author }}</span> {{item.author && item.pub ? '|' : ''}} <span>{{ item.pub }}</span>
             </div>
             <div class="right">
-              <strong>[{{ item.class_no }}]</strong>
-              <strong>{{ item.class_cde }}</strong>
+              <strong>{{ item.reg_dt }} ~ {{ item.return_dt }}</strong>
             </div>
           </div>
           <div class="option" v-if="item.sts === '대여중' || item.sts === '연체중'">
-            <input type="date" :value="commonJS.setYYYYMMDD(item.org_return_dt)"/>
-            <button class="btn-form btn-extend">연장</button>
-            <button class="btn-form btn-return" @click="return1(item.seq, item.book_cde, item.user_cde)">반납</button>
+              <input type="date" v-model="item.org_return_dt"/>
+              <button class="btn-form btn-change" @click="changeRtnDt(item.seq)">기간 변경</button>
+              <button class="btn-form btn-return" @click="return1(item.seq, item.book_cde, item.user_cde)">반납</button>
           </div>
         </li>
       </ul>
@@ -176,7 +197,7 @@
   display: flex;
   flex-direction: column;
 
-  .btn-extend{ background: var(--color-orange); color: #fff;}
+  .btn-change{ background: var(--color-orange); color: #fff;}
   .btn-search{ background: var(--color-green); color: #fff;}
   .btn-return{ background: var(--color-red); color: #fff;}
 
@@ -313,6 +334,7 @@
 
           *{margin-right: 5px;}
           & *:last-child{margin-right: 0;}
+
         }
       }
     }

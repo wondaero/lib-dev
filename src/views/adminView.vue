@@ -196,8 +196,6 @@
         }
       }
   
-      
-  
       section{
         display: flex;
         flex-direction: column;
@@ -218,7 +216,6 @@
           padding: 20px;
         }
       }
-  
     }
   }
 

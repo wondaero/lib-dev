@@ -93,7 +93,7 @@
               </div>
             </div>
             <div class="bottom">
-              <div class="left">
+              <div class="left txt-overflow1">
                 <span>{{ book.author }}</span> {{book.author && book.pub ? '|' : ''}} <span>{{ book.pub }}</span>
               </div>
               <div class="right">
@@ -233,6 +233,7 @@
             .left{
               flex: 1;
               margin-right: 5px;
+              width: 10px;
             }
             .class-no{
               color: #42c7d5;

@@ -90,8 +90,6 @@
 
       state.bookList.push(bookObj);
 
-      console.log(state.bookList);
-
       chkEach();
     }).catch(e => {
       console.error(e);

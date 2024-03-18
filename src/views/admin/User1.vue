@@ -53,7 +53,6 @@
 
     axios.post("http://localhost:3000/regUser", state.userDetail)
     .then((res) => {
-      console.log(res);
       if(res.data.length === 2 && res.data[0].affectedRows === 1){
         alert('등록되었습니다.');
         state.userDetail = {

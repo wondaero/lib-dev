@@ -124,8 +124,19 @@
       });
   }
 
-  const extend = () => {
-    alert('아직 사용할 수 없습니다.');
+  const changeRtnDt = (seq) => {
+    if(!confirm('반납기간을 변경하시겠습니까?')) return;
+
+    const book = state.borrowedBooks.filter(x => x.seq === seq)[0];
+    axios.post(`http://localhost:3000/changeRtnDt`, {
+        seq,
+        rtnDt: book.org_return_dt
+      }).then((res) => {
+        alert('반납기간이 변경되었습니다.');
+      }).catch((err) => {
+        console.log(err);
+        alert('[rtn003] 관리자에게 문의해주세요.');
+      });
   }
 
 </script>
@@ -174,19 +185,14 @@
                     <span>{{ book.author }}</span> {{book.author && book.pub ? '|' : ''}} <span>{{ book.pub }}</span>
                   </div>
                   <div class="right">
-                    <strong class="class-no">[{{ book.class_no }}]</strong> <strong>{{ book.class_cde }}</strong>
+                    <strong>{{ book.reg_dt }} ~</strong>
                   </div>
                 </div>
                 <div class="option">
-                  <div class="left">
-                    <strong>{{ book.reg_dt }} ~</strong>
-                  </div>
-                  <div class="right">
-                    <input type="date" v-model="book.org_return_dt" />
-                    <button class="btn-form btn-return" @click="return1(book.seq)">반납</button>
-                    <button class="btn-form btn-extend" disabled @click="extend(book.seq)">기간연장</button>
-                    <button class="btn-form btn-del" @click="del(book.seq)">제거</button>
-                  </div>
+                  <input type="date" v-model="book.org_return_dt" />
+                  <button class="btn-form btn-change" @click="changeRtnDt(book.seq)">기간변경</button>
+                  <button class="btn-form btn-return" @click="return1(book.seq)">반납</button>
+                  <button class="btn-form btn-del" @click="del(book.seq)">제거</button>
                 </div>
               </div>
             </label>
@@ -345,7 +351,7 @@
           background: var(--color-green);
           color: #fff;
         }
-        .btn-extend{
+        .btn-change{
           background: var(--color-orange);
           color: #fff;
         }
@@ -440,15 +446,10 @@
         
               .option{
                 display: flex;
-                justify-content: space-between;
-                align-items: center;
+                justify-content: flex-end;
                 margin-top: 10px;
                 padding-top: 10px;
                 border-top: 1px dashed #eee;
-                
-                .right{
-                  display: flex;
-                }
       
                 *{margin-right: 5px;}
                 & *:last-child{margin-right: 0;}
