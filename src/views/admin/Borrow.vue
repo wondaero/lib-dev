@@ -14,7 +14,7 @@
   const state = reactive({
     showedPopup: false,
     userList: [],
-    selectedUser: '',   //유저 선택시 object로 바꾸기{}
+    selectedUser: '',   //회원 선택시 object로 바꾸기{}
     userKeyword: '',
     bookCde: '',
     bookList: [],
@@ -34,7 +34,7 @@
       const { data } = res;
 
       if(!data.length){
-        alert('해당 유저가 존재하지않습니다.');
+        alert('해당 회원이 존재하지않습니다.');
         return;
       }else if(data.length === 1){
         state.selectedUser = data[0];
@@ -274,7 +274,7 @@
     <aside class="layer" v-if="state.showedPopup">
       <div class="popup-user" ref="userPop">
         <header>
-          <h1>유저정보</h1>
+          <h1>회원정보</h1>
           <span class="btn-close" @click="togglePopup();">
             <span></span>
             <span></span>

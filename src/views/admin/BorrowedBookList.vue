@@ -1,5 +1,5 @@
 <script setup>
-  import { reactive, ref, nextTick } from 'vue';
+  import { reactive } from 'vue';
   import axios from 'axios';
   import commonJS from '../../assets/common';
   import Pagination from '../../components/Pagination.vue'
@@ -21,8 +21,6 @@
       const { data } = res;
       state.bookList = data.list;
       state.totalCnt = data.listCnt;
-
-      console.log(state.bookList);
 
       let elem;
       let rtnDt;
@@ -119,7 +117,7 @@
         <div class="row">
           <label class="col">
             <span class="title">검색어</span>
-            <input type="text" class="" v-model="state.searchOpt.keyword" @keyup.enter="getBorrowedBookList" />
+            <input type="text" class="" v-model="state.searchOpt.keyword" @keyup.enter="getBorrowedBookList" placeholder="도서명, 저자, 출판사, 도서코드" />
           </label>
         </div>
         <div class="row">
@@ -139,14 +137,14 @@
             </label>
           </div>
         </div>
-        <div class="row">
+        <!-- <div class="row">
           <label class="col">
             <span class="title">기간</span>
             <input type="date" class=""/>
             ~
             <input type="date" class=""/>
           </label>
-        </div>
+        </div> -->
         <div class="row btns">
           <button class="btn-form btn-search" @click="getBorrowedBookList" >검색</button>
         </div>

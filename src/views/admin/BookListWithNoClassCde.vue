@@ -92,46 +92,8 @@
 
 </script>
 <template>
-  <article class="book-list-page">
+  <article class="book-list-with-no-class-cde-page">
     <h1>청구번호 관리</h1>
-    <div class="white-box search-case">
-      <div class="grid">
-        <div class="row">
-          <label class="col">
-            <span class="title">검색어</span>
-            <input type="text" class=""/>
-          </label>
-        </div>
-        <div class="row">
-          <div class="title col">대여상태</div>
-          <div class="col">
-            <label class="radio-custom">
-              <input type="radio" name="bookStatus" checked />
-              <strong>전체</strong>
-            </label>
-            <label class="radio-custom">
-              <input type="radio" name="bookStatus"/>
-              <strong>대여중</strong>
-            </label>
-            <label class="radio-custom">
-              <input type="radio" name="bookStatus"/>
-              <strong>연체중</strong>
-            </label>
-          </div>
-        </div>
-        <div class="row">
-          <label class="col">
-            <span class="title">기간</span>
-            <input type="date" class=""/>
-            ~
-            <input type="date" class=""/>
-          </label>
-        </div>
-        <div class="row btns">
-          <button class="btn-form">검색</button>
-        </div>
-      </div>
-    </div>
     <div class="white-box list-wrapper">
       <header>
         <div class="btns">
@@ -145,7 +107,6 @@
         <div>
           총 <strong> {{ state.totalCnt }}</strong>건
         </div>
-
       </header>
       <ul class="list">
         <li v-for="(book, idx) in state.bookList" :key="idx">
@@ -187,36 +148,11 @@
 </template>
 
 <style lang="scss" scoped>
-.book-list-page{
+.book-list-with-no-class-cde-page{
   display: flex;
   flex-direction: column;
 
   h1{font-size: 20px; margin-bottom: 10px;}
-  .search-case{
-    margin-bottom: 10px;
-    .row{
-      margin-bottom: 10px;
-
-      &:last-child{margin-bottom: 0;}
-      &.btns{justify-content: flex-end;}
-
-      .title{width: 100px;}
-
-
-      .col{align-items: center;}
-      input[type="text"]{width: 200px; height: 32px;}
-
-      .radio-custom{
-        display: flex;
-        align-items: center;
-        margin-right: 10px;
-        input{width: 20px; height: 20px; margin-right: 5px;}
-
-        &:last-child{margin-right: 0;}
-      }
-    }
-
-  }
 
   .list-wrapper{
     flex: 1 0 auto;

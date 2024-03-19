@@ -38,6 +38,7 @@
         isbn: data[0].isbn,
         startVol: data[0].start_vol,
         classCdeChk: data[0].class_cde_chk,
+        bookSts: data[0].book_sts,
         regDt: new Date(data[0].reg_dt).toLocaleDateString(),
       }
     });
@@ -256,7 +257,7 @@
         <div class="row">
           <label class="col">
             <span class="title">도서상태</span>
-            <select v-model="state.bookDetail.sts">
+            <select v-model="state.bookDetail.bookSts" :disabled="state.bookDetail.bookSts === '2'">
               <option value="1">대여가능</option>
               <option value="3">대여불가</option>
               <option value="4">보류</option>
@@ -436,7 +437,6 @@
         }
   
         .col{
-        // label{
           align-items: center;
           margin-right: 10px;
           &:last-child{margin-right: 0;}
@@ -463,7 +463,9 @@
             }
 
             &[readonly]{background: #eee; border: 0;}
+
           }
+          select{height: 32px; padding: 5px 10px;}
   
           &.with-btn{
             input{flex: 1; width: 215px; margin-right: 5px;}

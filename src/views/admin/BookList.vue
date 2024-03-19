@@ -1,5 +1,6 @@
 <script setup>
-  import { reactive, ref, nextTick } from 'vue';
+  import { reactive } from 'vue';
+  import commonJS from '../../assets/common';
   import axios from 'axios';
 
   import Pagination from '../../components/Pagination.vue'
@@ -15,19 +16,76 @@
     },
   });
 
-  const returnBook = () => {
-    if(confirm('반납하시겠습니까?')){
+  const return1 = (seq, bookCde, userCde) => {
+    if(!confirm('해당도서를 반납하시겠습니까?')) return;
+
+    if(seq === undefined ||  bookCde === undefined || userCde === undefined){ //필터
+      alert('[bl001] 반납을 진행할 수 없습니다.\n관리자에게 문의해주세요.');
+      return;
     }
-  };
-  const extendDate = () => {
-    if(confirm('연장하시겠습니까?')){
-    }
-  };
+    
+    axios.post(`http://localhost:3000/return1`, {
+      books: [{
+        seq,
+        book_cde: bookCde,
+        user_cde: userCde
+      }]
+    }).then((res) => {
+      alert('반납되었습니다.');
+      getBookList();
+    }).catch((err) => {
+      console.log(err);
+      alert('[bl002] 관리자에게 문의해주세요.');
+    });
+  }
+
+  const changeRtnDt = (seq) => {
+    if(!confirm('반납기간을 변경하시겠습니까?')) return;
+
+    const book = state.bookList.filter(x => x.seq === seq)[0];
+
+    axios.post(`http://localhost:3000/changeRtnDt`, {
+        seq,
+        rtnDt: book.org_return_dt
+      }).then((res) => {
+        alert('반납기간이 변경되었습니다.');
+        getBookList();
+      }).catch((err) => {
+        console.log(err);
+        alert('[bl003] 관리자에게 문의해주세요.');
+      });
+  }
 
 
   const getBookList = () => {
     axios.post("http://localhost:3000/getBookList", state.searchOpt).then((res) => {
       state.bookList = res.data.data;
+
+      let elem;
+      let orgRtnDt;
+      let sts;
+      let stsClass;
+
+      state.bookList.forEach((el, idx) => {
+        elem = state.bookList[idx];
+
+        orgRtnDt = commonJS.setYYYYMMDD(el.org_return_dt);
+
+        elem.org_return_dt = orgRtnDt;
+        elem.reg_dt = commonJS.setYYYYMMDD(el.reg_dt);
+
+        if(commonJS.setYYYYMMDD(new Date()) <= orgRtnDt) {
+          sts = '대여중';
+          stsClass = 'ing';
+        }else{
+          sts = '연체중';
+          stsClass = 'overing';
+        }
+
+        elem.sts = sts;
+        elem.stsClass = stsClass;
+      })
+
       state.totalCnt = res.data.total;
     });
   }
@@ -55,15 +113,15 @@
           <div class="title col">도서상태</div>
           <div class="col">
             <label class="radio-custom">
-              <input type="radio" name="bookSts" v-model="state.searchOpt.bookSts" value="전체" checked/>
+              <input type="radio" name="bookSts" value="" v-model="state.searchOpt.bookSts" checked/>
               <strong>전체</strong>
             </label>
             <label class="radio-custom">
-              <input type="radio" name="bookSts" v-model="state.searchOpt.bookSts" value="대여중" />
+              <input type="radio" name="bookSts" value="2" v-model="state.searchOpt.bookSts" />
               <strong>대여중</strong>
             </label>
             <label class="radio-custom">
-              <input type="radio" name="bookSts" v-model="state.searchOpt.bookSts" value="보류" />
+              <input type="radio" name="bookSts" value="4" v-model="state.searchOpt.bookSts" />
               <strong>보류</strong>
             </label>
           </div>
@@ -80,31 +138,34 @@
 
       </header>
       <ul class="list">
-        <li v-for="(book, idx) in state.bookList" :key="idx">
+        <li v-for="(book, idx) in state.bookList" :key="idx" :class="{hold: book.book_sts === '4'}">
           <RouterLink :to="`/admin/book1/${book.book_cde}`">
             <div class="top">
               <div class="left">
                 <strong class="book-cde">[{{ book.book_cde }}]</strong>
                 <span class="book-title txt-overflow1">{{ book.title }}</span>
               </div>
-              <div class="right">
-                <strong>연체중</strong>
-                <strong>(원대로)</strong>
+              <div class="right" v-if="book.book_sts === '2'">
+                <strong :class="book.stsClass">{{ book.sts }}</strong> <strong>({{ book.name }})</strong>
               </div>
             </div>
             <div class="bottom">
               <div class="left txt-overflow1">
                 <span>{{ book.author }}</span> {{book.author && book.pub ? '|' : ''}} <span>{{ book.pub }}</span>
               </div>
-              <div class="right">
+              <div class="right" v-if="book.book_sts === '2'">
+                <strong>{{ book.reg_dt }} ~</strong>
+              </div>
+              <div class="right" v-else>
                 <strong class="class-no">[{{ book.class_no }}]</strong> <strong>{{ book.class_cde }}</strong>
               </div>
             </div>
           </RouterLink>
-          <div class="option">
-            <input type="date"/>
-            <button class="btn-form btn-extend" @click="extendDate">연장</button>
-            <button class="btn-form btn-return" @click="returnBook">반납</button>
+          <div class="option" v-if="book.book_sts === '2'">
+            <input type="date" v-model="book.org_return_dt" />
+            <button class="btn-form btn-extend" @click="changeRtnDt(book.seq)">기간 변경</button>
+            <button class="btn-form btn-return" @click="return1(book.seq, book.book_cde, book.user_cde)">반납</button>
+            
           </div>
         </li>
       </ul>
@@ -185,6 +246,8 @@
         transition: color .5s;
         box-shadow: 0 3px 5px rgba(0, 0, 0, .2);
 
+        &.hold{background: #ddd;}
+
         &:last-child{
           margin-bottom: 0;
         }
@@ -216,12 +279,24 @@
             .left{
               flex: 1;
               display: flex;
-              margin-right: 5px;
               width: 10px;
               white-space: nowrap;
               overflow: hidden;
               .book-cde{margin-right: 5px;}
               .book-title{flex: 1;}
+            }
+
+            .right{
+              margin-left: 5px;
+
+              .ing{
+                color: #dad;
+                background: #fff;
+              }
+              .overing{
+                color: var(--color-red);
+                background: #fff;
+              }
             }
           }
   

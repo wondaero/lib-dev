@@ -144,7 +144,7 @@
 </script>
 <template>
   <article class="user1-page">
-    <h1>유저 {{ curUserCde ? '상세' : '등록' }}</h1>
+    <h1>회원 {{ curUserCde ? '상세' : '등록' }}</h1>
     <div class="white-box user-info">
       <div class="grid">
         <div class="row">
