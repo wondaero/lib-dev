@@ -5,13 +5,6 @@
 
   import Pagination from '../../components/Pagination.vue'
 
-  const toggleBookList = (bool, userCde) => {
-    const target = event.currentTarget;
-    users.forEach((user, idx) => {
-      if(user.userCde === userCde) users[idx].showList = !users[idx].showList; 
-    });
-  }
-
   const state = reactive({
     userList: [],
     totalCnt: 0,
@@ -86,7 +79,7 @@
 
       </header>
       <ul class="list">
-        <li v-for="user in state.userList" :key="user">
+        <li v-for="user in state.userList" :key="user" :class="{over: user.overCnt > 0}">
           <div class="top">
             <div class="left">
               <RouterLink :to="`/admin/user1/${user.user_cde}`">
@@ -95,45 +88,13 @@
               </RouterLink>
             </div>
             <div class="right">
-              대여현황: <strong>{{ user.lentCnt }}</strong> / <strong>{{ user.maxLentCnt }}</strong>
+              대여현황: <strong>{{ user.cur_borrowing_cnt }}</strong> / <strong>{{ user.borrowing_limit }}</strong>
             </div>
           </div>
           <div class="bottom">
             <div class="left">
               <strong>{{ user.tel }}</strong>
             </div>
-            <div class="right" v-if="user.books && user.books.length">
-              <strong class="option-control-btn" :class="user.showList ? 'close' : ''" @click="toggleBookList(undefined, user.userCde);">
-                <span></span>
-                <span></span>
-              </strong>
-            </div>
-          </div>
-          <div class="option" v-if="user.showList">
-            <ul class="book-list">
-              <li v-for="n in 3" :key="n">
-                <div class="top">
-                  <div class="left">
-                    <strong class="book-cde">[EM00004375]</strong>
-                    <span class="book-title txt-overflow1">프리젠테이션 오!프리젠테이션</span>
-                  </div>
-                  <div class="right">
-                    <strong>[325.1]</strong>
-                    <strong>한74ㅍ</strong>
-                  </div>
-                </div>
-                <div class="bottom">
-                  <div class="left">
-                    <span>한정선 지음</span>|<span>김영사</span>
-                  </div>
-                  <div class="right">
-                    <input type="date" />
-                    <button class="btn-form btn-extend">연장</button>
-                    <button class="btn-form btn-return">반납</button>
-                  </div>
-                </div>
-              </li>
-            </ul>
           </div>
         </li>
       </ul>
@@ -225,6 +186,15 @@
         margin-bottom: 10px;
         transition: color .5s;
         box-shadow: 0 3px 5px rgba(0, 0, 0, .2);
+        position: relative;
+
+        &.over{
+          border-left: 8px solid var(--color-red);
+          box-sizing: border-box;
+
+          &:hover{border-left-color: #ddd;}
+        }
+
 
 
         &:last-child{margin-bottom: 0;}
@@ -232,6 +202,17 @@
         &:hover .top .left a{
           color: #fff;
         }
+
+        // .red-dot{
+        //   position: absolute;
+        //   top: 5px;
+        //   right: 5px;
+        //   background: var(--color-red);
+        //   width: 10px;
+        //   height: 10px;
+        //   border-radius: 50%;
+        //   box-shadow: inset -1px -1px 5px rgba(0, 0, 0, .2);
+        // }
 
         
 
@@ -266,75 +247,8 @@
 
           .left{
             flex: 1;
-            margin-right: 5px;
           }
 
-          .right{
-            .option-control-btn{
-              background: red;
-              display: inline-block;
-              width: 30px;
-              height: 30px;
-              vertical-align: top;
-              border-radius: 50%;
-              position: relative;
-              cursor: pointer;
-
-              transition: transform .5s;
-
-              &.close{
-                transform: rotate(135deg);
-              }
-
-              span{
-                width: 20px;
-                height: 4px;
-                border-radius: 4px;
-                background: #fff;
-                display: inline-block;
-                vertical-align: top;
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                margin-left: -10px;
-                margin-top: -2px;
-
-                &:last-child{transform: rotate(90deg);}
-              }
-            }
-          }
-        }
-
-        .option{
-          margin-top: 10px;
-          padding-top: 10px;
-          padding-left: 50px;
-          border-top: 1px dashed #eee;
-
-
-          .book-list{
-            margin: 0;
-            padding: 0;
-            list-style: none;
-
-            color: #000;
-
-            li{
-
-              &:last-child{margin-bottom: 0;}
-
-              .bottom .right{
-                display: flex;
-                align-items: center;
-  
-                *{
-                  margin-right: 5px;
-                  &:last-child{margin-right: 0;}
-                }
-              }
-            }
-
-          }
         }
       }
     }

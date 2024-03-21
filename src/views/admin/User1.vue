@@ -117,6 +117,10 @@
         router.replace({name: 'userlist'});
       }else{
         console.error(res);
+        if(res.data[0].affectedRows === 0){
+          alert('도서반납 완료 후 다시 시도해주세요.');
+          return;
+        }
         alert('처리에 실패했습니다.\n관리자에게 문의해주세요.');
       }
     })
