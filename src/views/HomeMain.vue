@@ -1,82 +1,128 @@
-<script setup>
-  import { RouterLink, RouterView } from 'vue-router'
-  import { ref } from 'vue'
-
-
-  const header = ref(null);
-  const main = ref(null);
-  const hamburger = ref(null);
-  const nav = ref(null);
-
-  const setMenu = (bool) => {
-    if(window.innerWidth < 761) return;
-    const target = header._value;
-    if(bool === undefined) target.classList.toggle('show-menu');
-  }
-  
-  const setMenu_m = (bool) => {
-    const target = hamburger._value;
-    if(bool === undefined) target.classList.toggle('close');
-    nav._value.classList[target.classList.contains('close') ? 'add' : 'remove']('show-menu');
-  }
-</script>
-
 <template>
-  <div class="main">
-    <header ref="header" class="home-header">
-      <div>
-        <h1 class="logo"><img alt="logo" src="@/assets/lib-logo.svg" height="40" /></h1>
-        <nav ref="nav">
-          <ul @mouseenter="setMenu();" @mouseleave="setMenu();">
+  <section>
+        <article class="main1">
+          <div>
+            <h1>
+              <span>다음 세대</span>와 <br>
+              <span>지역 사회</span>를 품는 <span>비전</span>을 가진 <br>
+              <strong>그루터기 작은 도서관</strong>
+            </h1>
+            <div class="input-form">
+              <input type="text" />
+              <span class="search-icon"></span>
+              <img src="@/assets/main1-search-deco.svg"/>
+            </div>
+            <h2>
+              <strong>L</strong>ibrary with a vision that
+              <strong>E</strong>mbraces the
+              <strong>N</strong>ext genaration and
+              <strong>T</strong>own
+            </h2>
+          </div>
+        </article>
+        <article class="main2">
+          <div class="info">
+            <h3>
+              <span>우리 도서관은 <br /> 약 <strong>8,000</strong>권의</span><br /> <span>도서를 보유하고 있습니다.</span>
+            </h3>
+            <img src="@/assets/main2-deco.svg"/>
+          </div>
+          <header>
+            <h2>최근 등록 도서</h2>
+            <button>더보기</button>
+          </header>
+          <ul>
             <li>
-              <strong>도서관정보</strong>
-              <ul>
-                <li>도서관소개</li>
-                <li>이용안내</li>
-                <li>오시는길</li>
-              </ul>
+              <div class="book class100"></div>
+              <p class="txt-overflow1">책이름름름름</p>
             </li>
             <li>
-              <strong>도서관련</strong>
-              <ul>
-                <li>도서검색</li>
-                <li>도서신청</li>
-                <li>신간도서</li>
-              </ul>
+              <div class="book class200"></div>
+              <p class="txt-overflow1">책이름름름름</p>
             </li>
             <li>
-              <strong>열린마당</strong>
-              <ul>
-                <li><RouterLink to="/noticeList">공지사항</RouterLink></li>
-                <li>건의사항</li>
-                <li>도서관활동</li>
-              </ul>
+              <div class="book class300"></div>
+              <p class="txt-overflow1">책이름름름름</p>
             </li>
             <li>
-              <strong>나눔터</strong>
-              <ul>
-                <li>물품나눔</li>
-                <li>재능나눔</li>
-              </ul>
+              <div class="book class400"></div>
+              <p class="txt-overflow1">책이름름름름</p>
             </li>
             <li>
-              <!-- <strong><RouterLink to="/admin">도서관관리</RouterLink></strong> -->
-              <strong><RouterLink to="/admin">도서관관리</RouterLink></strong>
-              <!-- <strong>도서관관리</strong> -->
+              <div class="book class500"></div>
+              <p class="txt-overflow1">책이름름름름</p>
+            </li>
+            <li>
+              <div class="book class600"></div>
+              <p class="txt-overflow1">책이름름름름</p>
+            </li>
+            <li>
+              <div class="book class700"></div>
+              <p class="txt-overflow1">책이름름름름</p>
+            </li>
+            <li>
+              <div class="book class800"></div>
+              <p class="txt-overflow1">책이름름름름</p>
+            </li>
+            <li>
+              <div class="book class900"></div>
+              <p>책이름름름름</p>
             </li>
           </ul>
-        </nav>
-        <div ref="hamburger" class="hamburger" @click="setMenu_m();">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-      </div>
-    </header>
-    <main ref="main">
-      <RouterView />
-    </main>
-  </div>
+        </article>
+        <article class="main3">
+          <div class="info">
+            <img src="@/assets/main3-deco.svg"/>
+            <h3>
+              <!-- <span>우리 도서관은 <br /> 약 <strong>8,000</strong>권의</span><br /> <span>도서를 보유하고 있습니다.</span> -->
+              <span>우리 도서관은 <br class="br360"/> <strong>다양한 활동</strong>을 통해 <br /> 지역 주민들과 <strong>소통</strong>합니다.</span>
+            </h3>
+          </div>
+          <header>
+            <h2>진행중인 행사</h2>
+            <button>더보기</button>
+          </header>
+          <ul>
+            <li>
+              <div class="activity-cover">
+                <img src="@/assets/activity.svg" />
+              </div>
+              <div class="activity-txt">
+                <h4 class="txt-overflow1">어린이 발레</h4>
+                <!-- <p class="txt-overflow1">
+                  발레합니다 발레합니다
+                  발레합니다 발레합니다
+                  발레합니다 발레합니다
+                  발레합니다 발레합니다
+                  발레합니다 발레합니다
+                  발레합니다 발레합니다
+                  발레합니다 발레합니다
+                  발레합니다 발레합니다
+                  발레합니다 발레합니다
+                  발레합니다 발레합니다
+                  발레합니다 발레합니다
+                  발레합니다 발레합니다
+                  발레합니다 발레합니다
+                  발레합니다 발레합니다
+                  발레합니다 발레합니다
+                  발레합니다 발레합니다
+                  발레합니다 발레합니다
+                  발레합니다 발레합니다
+                  발레합니다 발레합니다
+                  발레합니다 발레합니다
+                  발레합니다 발레합니다
+                  발레합니다 발레합니다
+                  발레합니다 발레합니다
+                  발레합니다 발레합니다
+                  발레합니다 발레합니다
+                  발레합니다 발레합니다
+                  발레합니다 발레합니다
+                </p> -->
+              </div>
+            </li>
+          </ul>
+        </article>
+      </section>
 </template>
 
 <style lang="scss" scoped>
@@ -85,119 +131,6 @@
     display: flex;
     flex-direction: column;
     height: 100vh;
-  }
-  .home-header{
-    z-index: 2;
-    height: 50px;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-
-    transition: height .5s;
-
-    &.show-menu{
-      height: 170px;
-    }
-
-    & > div{
-      max-width: 1080px;
-      width: 100%;
-      padding: 0 20px;
-      display: flex;
-      justify-content: space-between;
-
-      .logo{padding-top: 5px;}
-
-      nav{
-        ul{
-          list-style: none;
-          padding: 0;
-        }
-
-        & > ul{
-          display: flex;
-          list-style: none;
-
-          li{
-            strong{
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              width: 120px;
-              height: 50px;
-              cursor: pointer;
-            }
-
-            ul{
-              li{
-                height: 40px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                cursor: pointer;
-
-                &:hover{
-                  background: linear-gradient(to top, var(--color-green) 20px, transparent 0);
-                }
-              }
-            }
-          }
-        }
-      }
-      
-
-      .hamburger{
-        display: none;
-        position: relative;
-        width: 35px;
-        height: 25px;
-        top: 25px;
-        cursor: pointer;
-        transform: translateY(-50%);
-        transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-
-        span{
-          display: block;
-          width: 100%;
-          height: 3px;
-          position: absolute;
-          left: 0;
-          background: #000;
-          border-radius: 3px;
-          transition: .3s;
-
-          &:nth-child(1){
-            top: 0;
-          }
-          &:nth-child(2){
-            top: 11px;
-          }
-          &:nth-child(3){
-            top: 22px;
-          }
-        }
-
-        &.close{
-
-          transform: translateY(-50%) scale(.5);
-          span{
-            &:nth-child(1){
-              top: 11px;
-              transform: rotate(45deg);
-            }
-            &:nth-child(2){
-              left: 5px;
-              opacity: 0;
-            }
-            &:nth-child(3){
-              top: 11px;
-              transform: rotate(-45deg);
-            }
-        }
-
-        }
-      }
-    }
   }
 
   main{
@@ -509,7 +442,6 @@
           // overflow-x: auto;
           // display: flex;
           margin-right: -20px;
-          
   
           li{
             margin-bottom: 10px;
@@ -558,12 +490,6 @@
   }
 
   @media (max-width: 1080px){
-    .home-header{
-
-      & > div{
-        padding: 0 20px;
-      }
-    }
 
     main section .main3{
       .info{
@@ -652,64 +578,6 @@
     }
   }
   @media (max-width: 761px){
-    .home-header{
-      
-
-      & > div{
-        nav{
-          position: fixed;
-          top: 0;
-          right: -250px;
-          height: 100%;
-          width: 200px;
-          background: #fff;
-          box-shadow: -1px 0 5px rgba(0, 0, 0, 0.2);
-          padding-top: 50px;
-
-          transition: right .5s;
-
-          & > ul{
-            display: block;
-            list-style: none;
-            overflow-y: auto;
-            height: 100%;
-            border-top: 1px solid rgba(0, 0, 0, .1);
-
-            li{
-              strong{
-                font-weight: bold;
-                width: 100%;
-                border-bottom: 1px solid rgba(0, 0, 0, .2);
-                background: linear-gradient(to right, var(--color-green) 5px, #fff 0)
-              }
-
-              ul{
-                background: rgba(0, 0, 0, .1);
-                li{
-                  height: 40px;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  cursor: pointer;
-
-                  &:hover{
-                    background: linear-gradient(to top, var(--color-green) 20px, transparent 0);
-                  }
-                }
-              }
-            }
-          }
-
-          &.show-menu{
-            right: 0;
-          }
-        }
-
-        .hamburger{
-          display: block;
-        }
-      }
-    }
 
     main section .main2 .info{
       display: block;

@@ -1,6 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 import HomeView from '../views/HomeView.vue'
+import HomeMain from '../views/HomeMain.vue'
+import NoticeList from '../views/NoticeList.vue'
+
+
+
 import AdminView from '../views/AdminView.vue'
 
 import BookList from '../views/admin/BookList.vue'
@@ -18,7 +23,19 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: HomeView 
+      component: HomeView,
+      children: [
+        {
+          path: '/',
+          name: 'HomeMain',
+          component: HomeMain
+        },
+        {
+          path: '/noticeList',
+          name: 'NoticeList',
+          component: NoticeList
+        },
+      ]
     },
     {
       path: '/admin',

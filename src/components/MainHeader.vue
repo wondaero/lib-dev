@@ -42,9 +42,9 @@
             <li>
               <strong>열린마당</strong>
               <ul>
-                <li>공지사항</li>
+                <li><RouterLink to="/notice">공지사항</RouterLink></li>
                 <li>건의사항</li>
-                <li>도서관활동</li>
+                <li><RouterLink to="/activity">도서관활동</RouterLink></li>
               </ul>
             </li>
             <li>
