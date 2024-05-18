@@ -3,8 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import HomeMain from '../views/HomeMain.vue'
 import NoticeList from '../views/NoticeList.vue'
-
-
+import Notice1 from '../views/Notice1.vue'
 
 import AdminView from '../views/AdminView.vue'
 
@@ -34,6 +33,11 @@ const router = createRouter({
           path: '/noticeList',
           name: 'NoticeList',
           component: NoticeList
+        },
+        {
+          path: '/notice1',
+          name: 'Notice1',
+          component: Notice1
         },
       ]
     },

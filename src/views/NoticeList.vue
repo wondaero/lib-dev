@@ -58,39 +58,24 @@
 
 </script>
 <template>
-  <article class="book-list-page">
-    <h1>도서 목록</h1>
+  <article class="notice-list-page">
+    <header>
+      <h1>공지사항</h1>
+      <RouterLink to="/notice1" class="btn-form btn-green">글쓰기</RouterLink>
+    </header>
+    <div class="header-line"></div>
     <div class="white-box search-case">
       <div class="grid">
         <div class="row">
-          <label class="col">
+          <label class="col mg-r10">
             <span class="title">검색어</span>
-            <input type="text" placeholder="도서명, 저자, 출판사, 도서코드" v-model="state.searchOpt.keyword" @keyup.enter="getBookList"/>
+            <input type="text" placeholder="제목, 내용" v-model="state.searchOpt.keyword" @keyup.enter="getBookList"/>
           </label>
-        </div>
-        <div class="row">
-          <div class="title col">도서상태</div>
-          <div class="col">
-            <label class="radio-custom">
-              <input type="radio" name="bookSts" value="" v-model="state.searchOpt.bookSts" checked/>
-              <strong>전체</strong>
-            </label>
-            <label class="radio-custom">
-              <input type="radio" name="bookSts" value="2" v-model="state.searchOpt.bookSts" />
-              <strong>대여중</strong>
-            </label>
-            <label class="radio-custom">
-              <input type="radio" name="bookSts" value="4" v-model="state.searchOpt.bookSts" />
-              <strong>보류</strong>
-            </label>
-          </div>
-        </div>
-        <div class="row btns">
-          <button class="btn-form btn-search" @click="getBookList">검색</button>
+          <button class="btn-form btn-green" @click="getBookList">검색</button>
         </div>
       </div>
     </div>
-    <div class="white-box list-wrapper">
+    <div class="list-wrapper">
       <header>
         <div class="btns"></div>
         <div>총 <strong>{{ state.totalCnt }}</strong>건</div>
@@ -134,39 +119,47 @@
 </template>
 
 <style lang="scss" scoped>
-.book-list-page{
+
+
+.notice-list-page{
+  width: 100%;
+  height: 100%;
+  max-width: 1080px;
+  margin-left: auto;
+  margin-right: auto;
   display: flex;
   flex-direction: column;
+  
+  header{
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 10px;
+    
+    h1{font-size: 20px; margin: 0;}
+  }
+  .header-line{
+    height: 8px;
+    background: linear-gradient(to right, var(--color-green), transparent);
+    margin-bottom: 20px;
+  }
 
-  .btn-extend{ background: var(--color-orange); color: #fff;}
-  .btn-search{ background: var(--color-green); color: #fff;}
-  .btn-return{ background: var(--color-red); color: #fff;}
+  .btn-green{ background: var(--color-green); color: #fff; margin-left: 5px;}
+  .btn-red{ background: var(--color-red); color: #fff; margin-left: 5px;}
+  .btn-orange{ background: var(--color-orange); color: #fff; margin-left: 5px;}
 
-  h1{font-size: 20px; margin-bottom: 10px;}
   .search-case{
     margin-bottom: 10px;
+
     .row{
       margin-bottom: 10px;
 
       &:last-child{margin-bottom: 0;}
-      &.btns{justify-content: flex-end;}
 
       .title{width: 100px;}
 
-
       .col{align-items: center;}
       input[type="text"]{width: 200px; height: 32px;}
-
-      .radio-custom{
-        display: flex;
-        align-items: center;
-        margin-right: 10px;
-        input{width: 20px; height: 20px; margin-right: 5px;}
-
-        &:last-child{margin-right: 0;}
-      }
     }
-
   }
 
   .list-wrapper{

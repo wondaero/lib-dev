@@ -260,11 +260,143 @@ const methods = {
   }
 }
 
+class UtilFnc{
+  constructor(param){
+      this.char = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  }
+  getRandomNum(mn, mx){
+      return Math.floor(Math.random() * (mx - mn + 1)) + mn;
+  }
+
+  getRdmTxt(len){
+      let rdmTxt = '';
+      for(let i = 0; i < len; i++){
+          rdmTxt += this.char[this.getRandomNum(0, this.char.length - 1)];
+      }
+
+      return rdmTxt;
+  }
+}
+
+class TextArea2 extends UtilFnc{
+  constructor(param){
+      super();
+      this.target = param.target;
+      console.log(this.target);
+      this.target.classList.add('custom-textarea');
+      this.files = [];
+      this.editable = param.editable !== undefined ? param.editable : true;
+
+
+      if(this.editable) this.createHeader();
+      this.createBody();
+
+
+      if(param.option){
+
+      }
+
+  }
+  createHeader(){
+      const header = document.createElement('header');
+      const ul = document.createElement('ul');
+
+      let li;
+      for(let i = 0; i < 1; i++){
+          li = document.createElement('li');
+          li.textContent = '이미지';
+          li.addEventListener('click', () => {
+              const fileInput = document.createElement('input');
+              fileInput.type = 'file';
+              fileInput.click();
+
+              fileInput.addEventListener('change', (e) => {
+
+                  const fileId = super.getRdmTxt(12);
+
+                  e.target.files[0].fileId = fileId;
+
+                  this.files.push(e.target.files[0]);
+
+                  console.log(this.files);
+
+                  this.previewImg(e.target.files[0]);
+
+
+              })
+          })
+          ul.appendChild(li);
+      }
+      // const imgBtn = document.createElement('button');
+      // imgBtn.textConent = '이미지';
+
+      header.appendChild(ul);
+      this.target.appendChild(header);
+  }
+
+  createBody(){
+      this.body = document.createElement('div');
+      this.body.classList.add('textarea2');
+      this.body.contentEditable = this.editable;
+
+      this.target.append(this.body);
+  }
+
+  previewImg(file){
+      const t = this;
+      if(file){
+          const reader = new FileReader();
+
+          reader.onload = function (e) {
+
+              const addedBr = document.createElement('br');
+              const img = document.createElement('img');
+              img.src = e.target.result;
+              img.dataset.id = file.fileId;
+              t.body.appendChild(img);
+              t.body.appendChild(addedBr);
+          }
+             
+          reader.readAsDataURL(file);
+      }
+  }
+
+  text2obj(){
+      const t = this;
+      const validFiles = [];
+      const tmpTag = document.createElement('div');
+      tmpTag.innerHTML = this.body.innerHTML;
+
+      let validFile;
+      tmpTag.querySelectorAll('img').forEach((img, idx) => {
+          validFile = t.files.filter(f => f.fileId === img.dataset.id)[0];
+
+          if(validFile) validFiles.push(validFile);
+
+          if(img.src.indexOf('data:image') === 0) img.src = '';
+      })
+
+      return {
+          files: validFiles,
+          content: tmpTag.innerHTML
+      }
+  }
+
+  getContent(c){
+      this.body.innerHTML = c;
+  }
+
+  setEditable(){
+      this.editable = !this.editable;
+  }
+}
+
 
 export default {
   xmlToObjArr: methods.xmlToObjArr,
   getClassifiedBookInfo: methods.getClassifiedBookInfo,
   getClassCde: methods.getClassCde,
   objToURLParam: methods.objToURLParam,
-  setYYYYMMDD: methods.setYYYYMMDD
+  setYYYYMMDD: methods.setYYYYMMDD,
+  TextArea2: TextArea2
 }
