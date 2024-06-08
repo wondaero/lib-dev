@@ -308,21 +308,19 @@ class TextArea2 extends UtilFnc{
           li.addEventListener('click', () => {
               const fileInput = document.createElement('input');
               fileInput.type = 'file';
+              const rdmTxt = super.getRdmTxt(12);
+              fileInput.name = rdmTxt;
+              fileInput.dataset.id = 'fileInput';
               fileInput.click();
 
               fileInput.addEventListener('change', (e) => {
-
-                  const fileId = super.getRdmTxt(12);
-
-                  e.target.files[0].fileId = fileId;
-
-                  this.files.push(e.target.files[0]);
-
-                  console.log(this.files);
-
-                  this.previewImg(e.target.files[0]);
-
-
+                const fileId = rdmTxt;
+                e.target.files[0].fileId = e.target.name;
+                // this.files.push(e.target.files[0]);
+                this.files.push(e.target);
+                console.log(this.files);
+                this.previewImg(e.target.files[0]);
+                // document.append(fileInput);
               })
           })
           ul.appendChild(li);
@@ -331,7 +329,7 @@ class TextArea2 extends UtilFnc{
       // imgBtn.textConent = '이미지';
 
       header.appendChild(ul);
-      this.target.appendChild(header);
+      this.target.prepend(header);
   }
 
   createBody(){
@@ -361,33 +359,48 @@ class TextArea2 extends UtilFnc{
       }
   }
 
-  text2obj(){
-      const t = this;
-      const validFiles = [];
-      const tmpTag = document.createElement('div');
-      tmpTag.innerHTML = this.body.innerHTML;
+  setFormData(){
+    const t = this;
+    const fData = new FormData();
 
-      let validFile;
-      tmpTag.querySelectorAll('img').forEach((img, idx) => {
-          validFile = t.files.filter(f => f.fileId === img.dataset.id)[0];
+    const tmpTag = document.createElement('div');
+    tmpTag.innerHTML = this.body.innerHTML;
 
-          if(validFile) validFiles.push(validFile);
+    let targetFile;
+    const tmpData = {};
 
-          if(img.src.indexOf('data:image') === 0) img.src = '';
-      })
+    tmpTag.querySelectorAll('img').forEach((img, idx) => {
+      if(img.src.indexOf('data:image') === 0){
+        targetFile = t.files.filter(f => f.name === img.dataset.id)[0];
+        fData.append('files[]', targetFile.files[0]);
 
-      return {
-          files: validFiles,
-          content: tmpTag.innerHTML
+        img.src = '';
+        img.removeAttribute('src');
+
+        tmpData[idx] = targetFile.files;
       }
+    })
+
+    tmpData.content = tmpTag.innerHTML;
+    fData.append('content', tmpTag.innerHTML);
+
+    console.log(tmpData);
+
+    return fData;
   }
 
-  getContent(c){
+  setContent(c){
       this.body.innerHTML = c;
   }
 
+  getContent(){
+    return this.body.innerHTML;
+  }
+
   setEditable(){
-      this.editable = !this.editable;
+    this.editable = !this.editable;
+    this.body.contentEditable = this.editable;
+    if(!this.editable) this.target.querySelector('header').remove();
   }
 }
 

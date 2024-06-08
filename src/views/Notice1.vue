@@ -6,17 +6,12 @@
   import Pagination from '../components/Pagination.vue'
 
   const state = reactive({
-    noticeList: [],
-    totalCnt: 0,
-    searchOpt: {
-      keyword: '',
-      bookSts: '',
-      page: 1,
-      listPerPage: 10
-    },
+    board: '',
+    editable: false
   });
 
   const getNoticeList = () => {
+    return;
     axios.post("http://localhost:3000/getNoticeList", state.searchOpt).then((res) => {
       state.bookList = res.data.data;
 
@@ -58,11 +53,48 @@
   const textEditor = ref(null);
 
   onMounted(() => {
-    const textArea = new commonJS.TextArea2({
+    state.board = new commonJS.TextArea2({
       target: textEditor._value,
       editable: true
     });
   })
+
+
+  const regBoard = () => {
+
+    const fData = state.board.setFormData();
+    fData.append('title', 'test');
+
+
+    axios.post("http://localhost:3000/regBoard", fData).then((res) => {
+      alert('게시물이 등록되었습니다.');
+      state.board.files = [];
+      state.board.setContent(res.data.content);
+      state.board.setEditable();
+
+      state.editable = false;
+    });
+  }
+
+  const setEditMode = () => {
+
+    state.editable = true;
+    state.board.setEditable();
+    state.board.createHeader();
+  }
+
+  const delBoard = () => {
+    if(!confirm('게시물을 삭제하시겠습니까?')) return;
+
+    axios.post("http://localhost:3000/delBoard", {
+      boardId: '???'
+    }).then((res) => {
+      alert('게시물이 삭제되었습니다.');
+
+      //목차쪽 라우터로
+    });
+
+  }
 
 
 
@@ -76,12 +108,15 @@
     <div ref="textEditor"></div>
     <div class="btns">
       <RouterLink to="/noticeList" class="btn-form btn-navy">목록</RouterLink>
-      <div>
-        <button class="btn-form btn-green">추가</button>
+      <div v-if="state.board.editable && !state.editable">
+        <button class="btn-form btn-green" @click="regBoard()">추가</button>
       </div>
-      <div>
-        <button class="btn-form btn-orange">수정</button>
-        <button class="btn-form btn-red">삭제</button>
+      <div v-else>
+        <div>
+          <button class="btn-form btn-orange" v-if="!state.editable" @click="setEditMode()">수정</button>
+          <button class="btn-form btn-green" v-else @click="regBoard()">수정</button>
+        </div>
+        <button class="btn-form btn-red" @click="delBoard()">삭제</button>
       </div>
     </div>
   </article>
@@ -113,8 +148,8 @@
   }
 
   .btn-green{ background: var(--color-green); color: #fff;}
-  .btn-red{ background: var(--color-red); color: #fff;}
-  .btn-orange{ background: var(--color-orange); color: #fff; margin-right: 5px;}
+  .btn-red{ background: var(--color-red); color: #fff; margin-left: 5px;}
+  .btn-orange{ background: var(--color-orange); color: #fff;}
   .btn-navy{ background: var(--color-navy); color: #fff; margin-right: 5px;}
 
   .btns{
@@ -122,6 +157,11 @@
     align-items: center;
     justify-content: flex-end;
     margin-top: 10px;
+
+    & > div{
+      display: flex;
+      align-items: center;
+    }
   }
 
 }
